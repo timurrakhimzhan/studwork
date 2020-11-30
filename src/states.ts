@@ -1,0 +1,16 @@
+export const MAIN_MENU = 'MAIN_MENU';
+export const NAME_INPUT = 'NAME_INPUT';
+export const CHOOSE_SUBJECT = 'CHOOSE_SUBJECT';
+export const UPLOAD_FILE = 'UPLOAD_FILE';
+export const PHONE_INPUT = 'PHONE_INPUT';
+export const EMAIL_INPUT = 'EMAIL_INPUT';
+export const CHOOSE_CONTACT_OPTION = 'CHOOSE_CONTACT_OPTION';
+export const DATE_INPUT = 'DATE_INPUT';
+export const COMMENT_INPUT = 'COMMENT_INPUT';
+export const PAYMENT = 'PAYMENT';
+
+export const CONTACTS = 'CONTACTS';
+
+export const FEEDBACK_EVALUATE = 'FEEDBACK_EVALUATE';
+export const FEEDBACK_COMMENT = 'FEEDBACK_COMMENT';
+export const FEEDBACK_GIVEN = 'FEEDBACK_GIVEN';
