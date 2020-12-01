@@ -56,7 +56,7 @@ export const mainMenuCallbackController = async (bot: TelegramBot, callback: Cal
         return;
     }
     if(callbackData === 'Позвонить') {
-        await bot.sendContact(callback.message.chat.id, '+77756969887', 'Адам');
+        await bot.sendContact(callback.message.chat.id, '+77756818268', 'StudWork');
         await bot.answerCallbackQuery(callback.id);
         return;
     }

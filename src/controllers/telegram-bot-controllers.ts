@@ -36,8 +36,8 @@ export async function receiverSendMessage(chatId: number, reply: string) {
         return bot.sendMessage(chatId, reply, {reply_markup: {
             inline_keyboard: [[
                 {text: 'Позвонить', callback_data: 'Позвонить'},
-                {text: 'Whatsapp', url: 'https://wa.me/77756969887'}],
-                [{text: 'Telegram', url: 'tg://resolve?domain=Adam0304'}]]
+                {text: 'Whatsapp', url: 'https://wa.me/77756818268'}],
+                [{text: 'Telegram', url: 'https://t.me/StudWorkk'}]]
             }});
     } else if(state === FEEDBACK_EVALUATE) {
         return bot.sendMessage(chatId, reply, {reply_markup: {
