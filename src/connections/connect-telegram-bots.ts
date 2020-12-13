@@ -1,42 +1,48 @@
 import TelegramBot from 'node-telegram-bot-api';
-import fs from "fs";
+import {readFile} from "../utils/io";
 
 
-export function connectReceiverBot(): Promise<TelegramBot> {
-    return new Promise((resolve, reject) => {
-        fs.readFile('./src/configs/bot-tokens.json', (error, content) => {
-            if(error || !content) {
-                console.error(`No such file ./src/configs/bot-tokens.json`);
-                process.exit(0);
-            }
-            const credentials = JSON.parse(content.toString());
-            const {receiverToken} = credentials;
-            if(!receiverToken) {
-                console.error(`No receiver bot token`);
-                process.exit(0);
-            }
-            resolve(new TelegramBot(receiverToken, {polling: true}))
-        });
-    })
+export async function connectReceiverBot(): Promise<TelegramBot> {
+    try{
+        const { receiverToken } = await readFile('./src/configs/bot-tokens.json') as {receiverToken: string};
+        if(!receiverToken) {
+            console.error('Receiver token is incorrect');
+            process.exit(0);
+        }
+        return new TelegramBot(receiverToken, {polling: true})
+    } catch(error) {
+        console.error(error);
+        process.exit(0);
+    }
+
 }
 
-export function connectInformatorBot(): Promise<TelegramBot> {
-    return new Promise((resolve, reject) => {
-        fs.readFile('./src/configs/bot-tokens.json', (error, content) => {
-            if(error || !content) {
-                console.error(`No such file ./src/configs/bot-tokens.json`);
-                process.exit(0);
-            }
-            const credentials = JSON.parse(content.toString());
-            const {informatorToken} = credentials;
-            if(!informatorToken) {
-                console.error(`No informator bot token`);
-                process.exit(0);
-            }
-            resolve(new TelegramBot(informatorToken, {polling: true}))
-        });
-    })
+export async function connectInformatorBot(): Promise<TelegramBot> {
+    try {
+        const { informatorToken } = await readFile('./src/configs/bot-tokens.json') as {informatorToken: string};
+        if(!informatorToken) {
+            console.error('Informator token is incorrect');
+            process.exit(0);
+        }
+        return new TelegramBot(informatorToken, {polling: false})
+    } catch (error) {
+        console.error(error);
+        process.exit(0);
+    }
+
 }
 
-
+export async function connectPayment(): Promise<void> {
+    try {
+        const { paymentToken } = await readFile('./src/configs/bot-tokens.json') as {paymentToken: string};
+        if(!paymentToken) {
+            console.error('Payment token is incorrect');
+            process.exit(0);
+        }
+        process.env['paymentToken'] = paymentToken;
+    } catch (error) {
+        console.error(error);
+        process.exit(0);
+    }
+}
 

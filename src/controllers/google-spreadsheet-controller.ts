@@ -1,10 +1,9 @@
-import {GoogleSpreadsheet} from "google-spreadsheet";
 import OrderInfo from "../OrderInfo";
 import App from "../App";
 import Feedback from "../Feedback";
+import {GoogleSpreadsheet} from "google-spreadsheet";
 
-export async function getSubjectsInfo(): Promise<Array<ISubject>> {
-    const doc = App.getInstance().getDoc();
+export async function getSubjectsInfo(doc: GoogleSpreadsheet): Promise<Array<ISubject>> {
     if(!doc) {
         throw new Error('Google spreadsheet error');
     }
@@ -16,22 +15,20 @@ export async function getSubjectsInfo(): Promise<Array<ISubject>> {
     }));
 }
 
-export async function addOrder(order: OrderInfo) {
-    const doc = App.getInstance().getDoc();
+export async function addOrder(doc: GoogleSpreadsheet, order: OrderInfo) {
     if(!doc) {
         throw new Error('Google spreadsheet error');
     }
     await doc.loadInfo();
     const sheet = doc.sheetsByIndex[0];
     await sheet.addRow([order.getName() as string, order.getUserName() as string,
-        order.getSubject()?.name as string, order.getSubject()?.price as string,
+        order.getSubject()?.name as string, order.getSubject()?.price as string, order.getTopic() as string,
         order.getPhone() as string, order.getEmail() as string,
-        order.getContactOption() as string, order.getDate() as string,
+        order.getContactOption() as string, order.getDate() as string, order.getTime() as string,
         order.getComment() as string, order.getUrl() as string]);
 }
 
-export async function addFeedback(chatId: number, feedback: Feedback) {
-    const doc = App.getInstance().getDoc();
+export async function addFeedback(doc: GoogleSpreadsheet, chatId: number, feedback: Feedback) {
     if(!doc) {
         throw new Error('Google spreadsheet error');
     }

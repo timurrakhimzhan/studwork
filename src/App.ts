@@ -1,14 +1,14 @@
-import {MAIN_MENU} from "./states";
 import OrderInfo from './OrderInfo';
 import TelegramBot from "node-telegram-bot-api";
-import {connectInformatorBot, connectReceiverBot} from "./connections/connect-telegram-bots";
+import {connectInformatorBot, connectPayment, connectReceiverBot} from "./connections/connect-telegram-bots";
 import {GoogleSpreadsheet} from "google-spreadsheet";
 import connectGoogleSpreadsheet from "./connections/connect-google-spreadsheet";
 import Feedback from "./Feedback";
+import StateContext from "./state";
 
 class App {
     private subjects: Array<{name: string, price: string}> = []
-    private chatState: {[key: number]: string | undefined} = {};
+    private chatState: {[key: number]: StateContext| undefined} = {};
     private orderInfos: {[key: number]: OrderInfo | undefined} = {};
 
     private feedBacks: {[key: number]: Feedback | undefined} = {};
@@ -18,19 +18,11 @@ class App {
     private receiverBot: TelegramBot | null = null;
     private informatorBot: TelegramBot | null = null;
 
-    private static instance: App;
-
-    public static getInstance = (): App => {
-        if(!App.instance) {
-            App.instance = new App();
-        }
-        return App.instance;
-    }
-
     public init = async () => {
         this.doc = await connectGoogleSpreadsheet();
         this.receiverBot = await connectReceiverBot();
         this.informatorBot = await connectInformatorBot();
+        await connectPayment();
     }
 
     setSubjects = (subjects: Array<{name: string, price: string}>) => {
@@ -44,16 +36,12 @@ class App {
         return found?.price || null;
     }
 
-    setChatState = (chatId: number, state: string) => {
-        this.chatState[chatId] = state;
-    }
-
-    getChatState = (chatId: number): string => {
+    getChatStateContext = (chatId: number): StateContext => {
         if(this.chatState[chatId]) {
-            return this.chatState[chatId] as string;
+            return this.chatState[chatId] as StateContext;
         }
-        this.setChatState(chatId, MAIN_MENU);
-        return this.chatState[chatId] as string;
+        this.chatState[chatId] = new StateContext(this.getReceiverBot(), this, chatId);
+        return this.chatState[chatId] as StateContext;
     }
 
     getOrderInfo = (chatId: number): OrderInfo => {
@@ -92,7 +80,7 @@ class App {
         return this.hasGivenFeedback[chatId] as boolean;
     }
 
-    getDoc = () => this.doc;
+    getDoc = () => this.doc as GoogleSpreadsheet;
 
     getReceiverBot = (): TelegramBot => this.receiverBot as TelegramBot;
 

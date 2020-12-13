@@ -3,10 +3,12 @@ class OrderInfo {
     private userName: string | null = null;
     private subject: ISubject | null = null;
     private url: string | null = null;
+    private topic: string | null = null;
     private phone: string | null = null;
     private email: string | null = null;
-    private contactOption: 'Телефон' | 'Почта' | null = null;
+    private contactOption: 'Телефон' | 'Почта' | 'Telegram' | null = null;
     private date: string | null = null;
+    private time: string | null = null;
     private comment: string | null = null;
 
     getName = () => {
@@ -21,35 +23,27 @@ class OrderInfo {
         return this.subject;
     }
 
-    getUrl = () => {
-        return this.url;
-    }
+    getUrl = () => this.url;
 
-    getPhone = () => {
-        return this.phone;
-    }
+    getTopic = () => this.topic;
 
-    getEmail = () => {
-        return this.email;
-    }
+    getPhone = () => this.phone;
 
-    getContactOption = () => {
-        return this.contactOption;
-    }
+    getEmail = () => this.email;
 
-    getDate = () => {
-        return this.date;
-    }
+    getContactOption = () => this.contactOption;
 
-    getComment = () => {
-        return this.comment;
-    }
+    getDate = () => this.date;
+
+    getTime = () => this.time;
+
+    getComment = () => this.comment;
 
     getReceipt = () => {
         const userName = this.getUserName() === '*Юзернейм не указан*' ? this.getUserName() : '@' + this.getUserName();
         return `Имя: *${this.getName()}* \nЮзернейм: ${userName} \nПредмет: *${this.getSubject()?.name}* \nЦена: *${this.getSubject()?.price}* \n` +
-            `Телефон: *${this.getPhone()}* \nПочта: *${this.getEmail()}* \nКак связаться: *${this.getContactOption()}* \n` +
-            `Дата сдачи: *${this.getDate()}* \nКомментарий: *${this.getComment()}*`;
+            `Тема работы: *${this.getTopic() || 'Тема не указана'}* \nТелефон: *${this.getPhone()}* \nПочта: *${this.getEmail()}* \n` +
+            `Как связаться: *${this.getContactOption()}* \nДата сдачи: *${this.getDate()}* \nВремя: *${this.getTime()}* \nКомментарий: *${this.getComment()}*`;
     }
 
     setName = (name: string) => {
@@ -68,6 +62,10 @@ class OrderInfo {
         this.url = url;
     }
 
+    setTopic = (topic: string) => {
+        this.topic = topic;
+    }
+
     setPhone = (phone: string) => {
         this.phone = phone;
     }
@@ -76,12 +74,16 @@ class OrderInfo {
         this.email = email;
     }
 
-    setContactOption = (contactOption: 'Телефон' | 'Почта') => {
+    setContactOption = (contactOption: 'Телефон' | 'Почта' | 'Telegram') => {
         this.contactOption = contactOption;
     }
 
     setDate = (date: string) => {
         this.date = date;
+    }
+
+    setTime = (time: string) => {
+        this.time = time;
     }
 
     setComment = (comment: string) => {

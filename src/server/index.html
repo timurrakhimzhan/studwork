@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Измени токен для платежа</title>
+</head>
+<style>
+    form {
+        display: flex;
+        flex-direction: column;
+        width: 50%
+    }
+</style>
+<body>
+    <form>
+        <label>
+            Новый токен для платежа:
+            <input name="newPaymentToken" type="text" />
+        </label>
+        <label>
+            Пароль админа:
+            <input name="password" type="password" />
+        </label>
+        <button id="button" type="submit">Подтвердить</button>
+    </form>
+</body>
+<script>
+    document.getElementById("button").addEventListener("click", function(event){
+        event.preventDefault();
+        const newPaymentToken = document.getElementsByName("newPaymentToken")[0].value;
+        const password = document.getElementsByName("password")[0].value;
+        fetch('/api/changePaymentToken', {
+            body: JSON.stringify({newPaymentToken, password}),
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+        .then((res) => {
+            if(res.status !== 200) {
+                alert('Произошла ошибка')
+            } else {
+                alert('Токен успешно изменен')
+            }
+        });
+    });
+</script>
+</html>

@@ -5,4 +5,4 @@ RUN npm install -g typescript
 RUN npm install
 COPY . ./
 RUN npm run compile
-CMD npm run start
+CMD NODE_ENV=develop npm run start
