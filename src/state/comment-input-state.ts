@@ -1,4 +1,4 @@
-import {BaseState, DateInputState, DateTimeInputState} from "./internal";
+import {BaseState, DateInputState} from "./internal";
 import {CallbackQuery, Message, PreCheckoutQuery} from "node-telegram-bot-api";
 
 class CommentInputState extends BaseState {
