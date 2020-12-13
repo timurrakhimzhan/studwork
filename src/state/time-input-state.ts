@@ -1,7 +1,6 @@
-import {BaseState} from "./internal";
+import {BaseState, PhoneInputState} from "./internal";
 import {Message} from "node-telegram-bot-api";
 import moment from 'moment';
-import PhoneInputState from "./phone-input-state";
 
 class TimeInputState extends BaseState {
     async initState(): Promise<any> {
