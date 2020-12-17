@@ -4,7 +4,8 @@ import {readFile} from "../utils/io";
 
 export async function connectReceiverBot(): Promise<TelegramBot> {
     try{
-        const { receiverToken } = await readFile('./src/configs/bot-tokens.json') as {receiverToken: string};
+        const receiverToken: string = process.env['TG_RECEIVER_BOT'] as string;
+        // const { receiverToken } = await readFile('./src/configs/bot-tokens.json') as {receiverToken: string};
         if(!receiverToken) {
             console.error('Receiver token is incorrect');
             process.exit(0);
@@ -19,7 +20,8 @@ export async function connectReceiverBot(): Promise<TelegramBot> {
 
 export async function connectInformatorBot(): Promise<TelegramBot> {
     try {
-        const { informatorToken } = await readFile('./src/configs/bot-tokens.json') as {informatorToken: string};
+        const informatorToken: string = process.env['TG_INFORMATOR_BOT'] as string;
+        // const { informatorToken } = await readFile('./src/configs/bot-tokens.json') as {informatorToken: string};
         if(!informatorToken) {
             console.error('Informator token is incorrect');
             process.exit(0);

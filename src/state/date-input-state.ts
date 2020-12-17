@@ -10,7 +10,7 @@ class DateInputState extends BaseState {
         const app = stateContext.getApp();
         const date = new Date();
         date.setFullYear(year)
-        date.setMonth(month);
+        date.setMonth(month - 1);
         date.setDate(day);
         app.getOrderInfo(stateContext.getChatId()).setDate(moment(date).format('DD.MM.YYYY'));
         await stateContext.setState(new TimeInputState(stateContext));

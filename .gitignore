@@ -3,3 +3,4 @@ src/configs/**
 dist
 .idea
 *.tar
+*.env

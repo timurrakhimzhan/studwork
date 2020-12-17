@@ -1,6 +1,11 @@
 import {getSubjectsInfo} from "./controllers/google-spreadsheet-controller";
 import App from "./App";
 import runServer from "./server";
+import dotenv from 'dotenv';
+import 'reflect-metadata';
+import {prepopulateContactOptions, prepopulateStatuses} from "./database/utils/prepopulate";
+import connectDatabase from "./connections/connect-database";
+dotenv.config();
 
 
 const initPolling = async (app: App) => {
@@ -15,10 +20,16 @@ const initPolling = async (app: App) => {
 
 const app = async () => {
     runServer();
+    await connectDatabase();
     const app = new App();
     await app.init();
     await initPolling(app);
     const receiverBot = app.getReceiverBot();
+
+    if(process.env['FIRST_RUN']) {
+        await prepopulateContactOptions();
+        await prepopulateStatuses();
+    }
 
     receiverBot.on('message', (msg) => {
         return app.getChatStateContext(msg.chat.id).messageController(msg);

@@ -12,7 +12,7 @@ class TimeInputState extends BaseState {
         const app = stateContext.getApp();
         const time = moment(message.text || '', 'HH:mm');
         if(!time.isValid() || !message.text?.includes(':')) {
-            return this.context.sendMessage('Неверный формат времени. Пример корректного формата: 14:30');
+            return this.context.sendMessage('Неверный формат времени. *Пример корректного формата: 14:30*');
         }
         app.getOrderInfo(stateContext.getChatId()).setTime(time.format('HH:mm'));
         await stateContext.setState(new PhoneInputState(stateContext));
