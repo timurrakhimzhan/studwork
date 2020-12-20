@@ -1,44 +1,49 @@
-import {getSubjectsInfo} from "./controllers/google-spreadsheet-controller";
 import App from "./App";
 import runServer from "./server";
 import dotenv from 'dotenv';
 import 'reflect-metadata';
-import {prepopulateContactOptions, prepopulateStatuses} from "./database/utils/prepopulate";
 import connectDatabase from "./connections/connect-database";
+import ReceiverBotContext from "./bot-contexts/receiver-bot";
+import seed from "./database/utils/seed";
+import Order from "./database/models/Order";
+import Subject from "./database/models/Subject";
+import Teacher from "./database/models/Teacher";
+import WorkType from "./database/models/WorkType";
+import ContactOption from "./database/models/ContactOption";
 dotenv.config();
 
 
-const initPolling = async (app: App) => {
+const initSubjectsPolling = async (botContext: ReceiverBotContext) => {
     async function poll() {
-        const subjects = await getSubjectsInfo(app.getDoc());
-        app.setSubjects(subjects);
-        console.log('Предметы загружены', subjects);
+        await botContext.fetchSubjects();
+        console.log('Subjects are updated', botContext.getSubjects().map((subject) => subject.name));
     }
-    await poll();
+    console.log('Subjects poll started...');
     return setInterval(poll, 60000);
 }
 
 const app = async () => {
     runServer();
     await connectDatabase();
+    await seed();
+    console.log('Database is filled');
     const app = new App();
     await app.init();
-    await initPolling(app);
-    const receiverBot = app.getReceiverBot();
+    await app.getReceiverBotContext().init();
+    console.log('Initialization is finished');
 
-    if(process.env['FIRST_RUN']) {
-        await prepopulateContactOptions();
-        await prepopulateStatuses();
-    }
+    await initSubjectsPolling(app.getReceiverBotContext());
+
+    const receiverBot = app.getReceiverBotContext().getBot();
 
     receiverBot.on('message', (msg) => {
-        return app.getChatStateContext(msg.chat.id).messageController(msg);
+        return app.getReceiverBotContext().getChatStateContext(msg.chat.id).messageController(msg);
     });
     receiverBot.on('callback_query', (cb) => {
         if(!cb.message || !cb.data) {
             return;
         }
-        return app.getChatStateContext(cb.message?.chat.id).callbackController(cb);
+        return app.getReceiverBotContext().getChatStateContext(cb.message?.chat.id).callbackController(cb);
     });
     receiverBot.on('pre_checkout_query', (preCq) => {
         return receiverBot.answerPreCheckoutQuery(preCq.id, true);
