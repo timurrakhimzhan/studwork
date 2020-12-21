@@ -6,11 +6,12 @@ import {
     SendMessageOptions,
 } from "node-telegram-bot-api";
 import {generateInlineMenu, generatePriceList, generateSubjectsMessage} from "../../utils/tg-utils";
+import {OrdersState} from "./internal";
 
 const mainMenu: Array<Array<KeyboardButton>> =  [
-    [{text: 'Предметы'}, {text: 'Заказать работу'}],
-    [{text: 'Прайс-лист'}, {text: 'Контакты'}],
-    [{text: 'Оценить работу бота'}]
+    [{text: 'Предметы'}, {text: 'Прайс-лист'}],
+    [{text: 'Заказать работу'}, {text: 'Мои заказы'}],
+    [{text: 'Контакты'}, {text: 'Оценить работу бота'}]
 ];
 
 class MainMenuState extends ReceiverBaseState {
@@ -46,6 +47,9 @@ class MainMenuState extends ReceiverBaseState {
         }
         if(message.text?.trim() === 'Заказать работу') {
             return stateContext.setState(new NameInputState(stateContext));
+        }
+        if(message.text?.trim() === 'Мои заказы') {
+            return stateContext.setState(new OrdersState(stateContext));
         }
         await this.stateContext.sendMessage('Выберите интересующую вас тему:');
     }

@@ -1,7 +1,6 @@
-import {ReceiverBaseState, UploadFileState} from "./internal";
+import {ReceiverBaseState, ChooseWorkTypeState} from "./internal";
 import {generateInlineMenu} from "../../utils/tg-utils";
 import {CallbackQuery, Message, SendMessageOptions} from "node-telegram-bot-api";
-import ChooseWorkTypeState from "./choose-work-type-state";
 import MainMenuState from "./main-menu-state";
 
 class ChooseSubjectState extends ReceiverBaseState {

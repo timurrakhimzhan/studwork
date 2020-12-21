@@ -6,10 +6,9 @@ import connectDatabase from "./connections/connect-database";
 import ReceiverBotContext from "./bot-contexts/receiver-bot";
 import seed from "./database/utils/seed";
 import Order from "./database/models/Order";
-import Subject from "./database/models/Subject";
+import Status from "./database/models/Status";
+import {Sequelize} from "sequelize-typescript";
 import Teacher from "./database/models/Teacher";
-import WorkType from "./database/models/WorkType";
-import ContactOption from "./database/models/ContactOption";
 dotenv.config();
 
 
@@ -31,6 +30,10 @@ const app = async () => {
     await app.init();
     await app.getReceiverBotContext().init();
     console.log('Initialization is finished');
+
+    // const teacher = new Teacher();
+    // teacher.login = 'admin';
+    // const teachers = await Teacher.findAll({ where: {login: teacher.login} });
 
     await initSubjectsPolling(app.getReceiverBotContext());
 

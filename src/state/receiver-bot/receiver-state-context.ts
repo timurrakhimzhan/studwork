@@ -15,7 +15,7 @@ export default class ReceiverStateContext extends AbstractStateContext {
         this.state = new MainMenuState(this);
     }
 
-    public messageController = async (message: Message) => {
+    public async messageController(message: Message) {
         const botContext = this.getBotContext();
         try {
             await this.state.onNewMessage();
@@ -30,6 +30,6 @@ export default class ReceiverStateContext extends AbstractStateContext {
             await this.sendMessage('Добрый день! Вас приветствует компания StudWork!');
             return this.setState(new MainMenuState(this));
         }
-        return this.state.messageController(message);
+        return super.messageController(message);
     }
 }

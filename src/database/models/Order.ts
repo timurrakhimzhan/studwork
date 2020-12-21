@@ -44,13 +44,19 @@ export default class Order extends Model {
     comment!: string;
 
     @Column({type: DataType.TEXT, allowNull: true})
-    fileLink!: string | null;
+    assignmentUrl!: string | null;
 
     @Column({type: DataType.INTEGER, allowNull: true})
-    price!: number;
+    price!: number | null;
 
     @Column({type: DataType.TEXT, allowNull: true})
-    teacherComment!: string;
+    priceComment!: string | null;
+
+    @Column({type: DataType.TEXT, allowNull: true})
+    solutionUrl!: string | null;
+
+    @Column({type: DataType.TEXT, allowNull: true})
+    solutionComment!: string | null;
 
     @Column({allowNull: false, defaultValue: false})
     mock!: boolean;

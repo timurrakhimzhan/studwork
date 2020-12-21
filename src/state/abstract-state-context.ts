@@ -31,15 +31,15 @@ abstract class AbstractStateContext {
         this.lastMessageId = message_id;
     }
 
-    public messageController = async (message: Message) => {
+    async messageController(message: Message) {
         return this.state.messageController(message);
     }
 
-    public callbackController = async (callback: CallbackQuery) => {
+    async callbackController (callback: CallbackQuery) {
         return this.state.callbackController(callback);
     }
 
-    public initState = async () => {
+    async initState() {
         return this.state.initState();
     }
 }

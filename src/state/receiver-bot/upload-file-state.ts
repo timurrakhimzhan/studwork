@@ -29,7 +29,7 @@ class UploadFileState extends ReceiverBaseState {
         }
         const order: Order = botContext.getOrderInfo(stateContext.getChatId());
         order.topic = topic;
-        order.fileLink = url;
+        order.assignmentUrl = url;
         await stateContext.setState(new CommentInputState(stateContext));
     }
 }

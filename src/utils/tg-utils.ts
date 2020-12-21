@@ -1,4 +1,4 @@
-import {InlineKeyboardButton} from "node-telegram-bot-api";
+import {InlineKeyboardButton, KeyboardButton} from "node-telegram-bot-api";
 import Subject from "../database/models/Subject";
 
 export const generateSubjectsMessage = (subjects: Array<Subject>) => {
@@ -22,6 +22,15 @@ export const generateInlineMenu = (menuItems: Array<{name: string; callback?: st
         }
         return ({text: menuItem.name, callback_data: menuItem.name});
     });
+    while(buttons.length) {
+        markup.push(buttons.splice(0, 2));
+    }
+    return markup;
+}
+
+export const generateKeyboardMenu = (menuItems: Array<{name: string}>): Array<Array<KeyboardButton>> => {
+    const markup: Array<Array<KeyboardButton>> = [];
+    const buttons: Array<KeyboardButton> = menuItems.map(menuItem => ({text: menuItem.name}));
     while(buttons.length) {
         markup.push(buttons.splice(0, 2));
     }

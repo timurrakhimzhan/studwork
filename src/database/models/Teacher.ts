@@ -8,7 +8,7 @@ export default class Teacher extends Model {
     @Column({primaryKey: true, autoIncrement: true})
     teacherId!: number;
 
-    @Column({allowNull: false})
+    @Column({allowNull: false, unique: true})
     login!: string;
 
     @Column({allowNull: false})
@@ -16,6 +16,12 @@ export default class Teacher extends Model {
 
     @Column({allowNull: true})
     chatId!: number;
+
+    @Column({allowNull: false, defaultValue: false})
+    isAdmin!: boolean;
+
+    @Column({allowNull: false})
+    name!: string;
 
     @HasMany(() => Order, 'teacherId')
     orders!: Array<Order>;

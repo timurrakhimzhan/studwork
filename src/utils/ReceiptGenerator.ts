@@ -1,5 +1,6 @@
 import moment from "moment";
 import Order from "../database/models/Order";
+import {statusMeaningMap} from "../database/models/Status";
 
 export default class ReceiptGenerator {
     public static generateReceiptForClient = (order: Order) => {
@@ -8,13 +9,14 @@ export default class ReceiptGenerator {
         return `Вас зовут: *${order.clientName}* \n` +
             `Предмет: *${order.subject.name}* \n` +
             `Тема работы: *${order.workType.name || 'Тема не указана'}*\n` +
-            `Файл: *${order.fileLink ? 'Прикреплен' : 'Не прикреплен'}*\n` +
+            `Файл: *${order.assignmentUrl ? 'Прикреплен' : 'Не прикреплен'}*\n` +
             `Ваш комментарий: *${order.comment}* \n` +
             `Дата сдачи: *${date}* \n` +
             `Время: *${time}* \n` +
             `Ваш телефон: *${order.phone}* \n` +
             `Ваша почта: *${order.email}* \n` +
-            `Как связаться: *${order.contactOption.name}*`;
+            `Как связаться: *${order.contactOption.name}* \n` +
+            `Статус заказа: *${statusMeaningMap[order.status.name]}*`;
     }
 
     public static getReceiptForTeacher = (order: Order) => {
@@ -25,12 +27,13 @@ export default class ReceiptGenerator {
             `Юзернейм клиента: ${userName} \n` +
             `Предмет: *${order.subject.name}* \n` +
             `Тема работы: *${order.workType.name || 'Тема не указана'}*\n` +
-            `Файл: *${order.fileLink ? 'Прикреплен' : 'Не прикреплен'}*\n` +
+            `Файл: *${order.assignmentUrl ? 'Прикреплен' : 'Не прикреплен'}*\n` +
             `Комментарий клиента: *${order.comment}* \n` +
             `Дата сдачи: *${date}* \n` +
             `Время: *${time}* \n` +
             `Телефон клиента: *${order.phone}* \n` +
             `Почта клиента: *${order.email}* \n` +
-            `Как связаться: *${order.contactOption.name}*`;
+            `Как связаться: *${order.contactOption.name}* \n` +
+            `Статус заказа: *${statusMeaningMap[order.status.name]}*`;
     }
 }

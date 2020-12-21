@@ -91,6 +91,8 @@ export async function fillTeachers() {
         mock: true,
         login: 'admin',
         password: 'password',
+        isAdmin: true,
+        name: 'Тимур Рахимжан',
         subjects,
     });
     await admin.$set('subjects', subjects);
@@ -100,6 +102,7 @@ export async function fillTeachers() {
         mock: true,
         login: 'math',
         password: 'password',
+        name: 'Матеатик Математиков',
     })
     await mathTeacher.$set('subjects', subjects.filter((subject) => subject.name === 'Математика'));
     // await mathTeacher.save();

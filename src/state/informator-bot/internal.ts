@@ -3,3 +3,5 @@ export { default as AbstractBaseState } from '../abstract-base-state';
 
 export { default as InformatorStateContext} from './informator-state-context';
 export { default as InformatorBaseState} from './informator-base-state';
+
+export { default as LoginInputState } from './login-input-state';
