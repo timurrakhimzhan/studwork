@@ -1,8 +1,9 @@
 import Status, {statuses, statusMeaningMap, StatusName} from "../../database/models/Status";
 import Order from "../../database/models/Order";
 import {CallbackQuery, InlineKeyboardButton, Message, SendMessageOptions} from "node-telegram-bot-api";
-import {generateKeyboardMenu} from "../../utils/message-utils";
+import {generateKeyboardMenu, generateReceipt, getBufferFromUrl} from "../../utils/message-utils";
 import {AbstractBaseState} from "./internal";
+import {CALLBACK_CLIENT_FILE, CALLBACK_TEACHER_FILE, STATUS_FINISHED} from "../../constants";
 
 export default abstract class AbstractOrdersState extends AbstractBaseState {
     protected statusOrders: {[T in StatusName]?: Array<Order>} = {}
@@ -35,7 +36,6 @@ export default abstract class AbstractOrdersState extends AbstractBaseState {
 
     protected abstract getStatusCounts(): Promise<Array<Status>>;
     protected abstract getOrders(): Promise<Array<Order>>;
-    protected abstract generateReceipt(): string;
     protected abstract generateExtraInlineMarkup(): Array<Array<InlineKeyboardButton>>;
 
     protected async fetchReceipts(status: StatusName) {
@@ -69,7 +69,16 @@ export default abstract class AbstractOrdersState extends AbstractBaseState {
             inlineMarkup[0].pop();
         }
         await this.fetchReceipts(this.currentStatus);
-        const receipt = this.generateReceipt();
+
+        const orders = this.statusOrders[this.currentStatus] as Array<Order>
+        const order = orders[this.currentOrderPosition];
+        if(order.assignmentUrl) {
+            inlineMarkup.push([{text: 'Показать прикрепленный файл', callback_data: CALLBACK_CLIENT_FILE}])
+        }
+        if(order.status.name === STATUS_FINISHED) {
+            inlineMarkup.push([{text: 'Показать выполненное задание', callback_data: CALLBACK_TEACHER_FILE}])
+        }
+        const receipt = generateReceipt(order);
         const inlineMenu = this.generateExtraInlineMarkup()
         inlineMarkup = [...inlineMarkup, ...inlineMenu];
         if(editCurrentMessage) {
@@ -121,6 +130,36 @@ export default abstract class AbstractOrdersState extends AbstractBaseState {
             }
             await this.showReceipt(true);
             await bot.answerCallbackQuery(callback.id);
+        }
+
+        const orders = this.statusOrders[this.currentStatus] as Array<Order>;
+        const order = orders[this.currentOrderPosition];
+
+        if(callbackData === CALLBACK_CLIENT_FILE) {
+            const url = order.assignmentUrl;
+            try {
+                const document = await getBufferFromUrl(url || '');
+                await bot.sendDocument(stateContext.getChatId(), document, {}, {
+                    filename: 'Прикрепленный файл к заказу #' + orders[this.currentOrderPosition].orderId,
+                });
+            } catch(e) {
+                await stateContext.sendMessage('Извините, не удалось загрузить прикрепленный файл.')
+            } finally {
+                await bot.answerCallbackQuery(callback.id);
+            }
+        }
+        if(callbackData === CALLBACK_TEACHER_FILE) {
+            const url = order.solutionUrl;
+            try {
+                const document = await getBufferFromUrl(url || '');
+                await bot.sendDocument(stateContext.getChatId(), document, {}, {
+                    filename: 'Выполненное задание к заказу #' + orders[this.currentOrderPosition].orderId,
+                });
+            } catch(e) {
+                await stateContext.sendMessage('Извините, не удалось загрузить прикрепленный файл.')
+            } finally {
+                await bot.answerCallbackQuery(callback.id);
+            }
         }
     }
 }

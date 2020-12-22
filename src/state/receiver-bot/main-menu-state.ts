@@ -7,6 +7,7 @@ import {
 } from "node-telegram-bot-api";
 import {generateInlineMenu, generatePriceList, generateSubjectsMessage} from "../../utils/message-utils";
 import {OrdersState} from "./internal";
+import Order from "../../database/models/Order";
 
 const mainMenu: Array<Array<KeyboardButton>> =  [
     [{text: 'Предметы'}, {text: 'Прайс-лист'}],
@@ -46,10 +47,9 @@ class MainMenuState extends ReceiverBaseState {
             }
         }
         if(message.text?.trim() === 'Заказать работу') {
-            stateContext.resetOrder();
-            const order = stateContext.getOrder();
+            const order = new Order();
             order.mock = !!process.env['MOCK'];
-            return stateContext.setState(new NameInputState(stateContext));
+            return stateContext.setState(new NameInputState(stateContext, order));
         }
         if(message.text?.trim() === 'Мои заказы') {
             return stateContext.setState(new OrdersState(stateContext));

@@ -16,7 +16,7 @@ export default class OrdersRejectState extends AbstractOrderRejectState {
     }
 
     protected async updateDatabase(rejectionComment: string): Promise<any> {
-        this.order.rejectionTeacherComment = rejectionComment;
+        this.order.rejectionTeacherReason = rejectionComment;
         const status = await Status.findOne({ where: {name: STATUS_REJECTED_BY_TEACHER}});
         if(!status) {
             const stateContext = this.stateContext;

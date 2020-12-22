@@ -1,14 +1,21 @@
-import {ReceiverBaseState, ChooseContactOptionState} from "./internal";
-import {CallbackQuery, Message, PreCheckoutQuery} from "node-telegram-bot-api";
-import App from "../../App";
+import {
+    ChooseContactOptionState,
+    ReceiverOrderState,
+    PhoneInputState
+} from "./internal";
+import {Message} from "node-telegram-bot-api";
 
 
 const regex = /\S+@\S+\.\S+/;
 
-class EmailInputState extends ReceiverBaseState {
+class EmailInputState extends ReceiverOrderState {
 
     async initState() {
         await this.stateContext.sendMessage('Введите Ваш адрес электронной почты:');
+    }
+
+    async onBackMessage(): Promise<any> {
+        return this.stateContext.setState(new PhoneInputState(this.stateContext, this.order));
     }
 
     async messageController(message: Message) {
@@ -17,10 +24,8 @@ class EmailInputState extends ReceiverBaseState {
             await stateContext.sendMessage('Некорректный адрес электронной почты, пожалуйста, повторите попытку.')
             return;
         }
-        const order = stateContext.getOrder();
-        order.email = message.text;
-
-        await stateContext.setState(new ChooseContactOptionState(stateContext))
+        this.order.email = message.text;
+        await stateContext.setState(new ChooseContactOptionState(stateContext, this.order))
     }
 }
 

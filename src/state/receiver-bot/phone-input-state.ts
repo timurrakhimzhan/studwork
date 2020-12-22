@@ -1,9 +1,13 @@
-import {ReceiverBaseState, EmailInputState} from "./internal";
+import {ReceiverBaseState, EmailInputState, ReceiverOrderState, TimeInputState} from "./internal";
 import {Message} from "node-telegram-bot-api";
 
-class PhoneInputState extends ReceiverBaseState {
+class PhoneInputState extends ReceiverOrderState {
     async initState() {
         await this.stateContext.sendMessage('Введите Ваш номер телефона, например +77071231212 или 87071231212:');
+    }
+
+    async onBackMessage(): Promise<any> {
+        return this.stateContext.setState(new TimeInputState(this.stateContext, this.order));
     }
 
     async messageController(message: Message) {
@@ -14,10 +18,8 @@ class PhoneInputState extends ReceiverBaseState {
             await stateContext.sendMessage('Некорректный номер телефона, *номер должен начинаться на +7 или 8*, например +77071231212 или 87071231212. Пожалуйста, повторите попытку.');
             return;
         }
-        const botContext = this.stateContext.getBotContext();
-        const order = stateContext.getOrder();
-        order.phone = message.text as string;
-        await stateContext.setState(new EmailInputState(stateContext));
+        this.order.phone = message.text as string;
+        await stateContext.setState(new EmailInputState(stateContext, this.order));
     }
 }
 

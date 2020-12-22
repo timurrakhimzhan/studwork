@@ -1,17 +1,18 @@
-import {ReceiverBaseState, CommentInputState} from "./internal";
+import {ReceiverBaseState, CommentInputState, ReceiverOrderState, ChooseWorkTypeState} from "./internal";
 import {Message} from "node-telegram-bot-api";
-import OrderInfo from "../../bot-contexts/receiver-bot/order-info";
-import Order from "../../database/models/Order";
 
-class UploadFileState extends ReceiverBaseState {
+class UploadFileState extends ReceiverOrderState {
      async initState() {
         await this.stateContext.sendMessage('Прикрепите файл (фотографию, документ, либо архив файлов) либо укажите тему работы:');
     }
 
+    async onBackMessage(): Promise<any> {
+        return this.stateContext.setState(new ChooseWorkTypeState(this.stateContext, this.order));
+    }
+
     async messageController(message: Message) {
         const stateContext = this.stateContext;
-        const botContext = stateContext.getBotContext();
-        const bot = botContext.getBot();
+        const bot = stateContext.getBotContext().getBot();
         if(!message.photo && !message.document && !message.text) {
             await stateContext.sendMessage('Нужно прикрепить фотографию/документ/архив, либо указать тему работы, чтобы продолжить.');
             return;
@@ -27,10 +28,9 @@ class UploadFileState extends ReceiverBaseState {
             await stateContext.sendMessage('Ошибка ввода. Нужно прикрепить фотографию/документ/архив, либо указать тему работы, пожалуйста, повторите попытку.');
             return;
         }
-        const order: Order = stateContext.getOrder();
-        order.topic = topic;
-        order.assignmentUrl = url;
-        await stateContext.setState(new CommentInputState(stateContext));
+        this.order.topic = topic;
+        this.order.assignmentUrl = url;
+        await stateContext.setState(new CommentInputState(stateContext, this.order));
     }
 }
 

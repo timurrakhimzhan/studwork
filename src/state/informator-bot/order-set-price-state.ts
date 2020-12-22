@@ -1,29 +1,12 @@
-import {InformatorBaseState, OrdersState} from "./internal";
+import {OrdersState, OrderPriceCommentState, InformatorOrderState} from "./internal";
 import Order from "../../database/models/Order";
-import InformatorStateContext from "./informator-state-context";
 import {KeyboardButton, Message, SendMessageOptions} from "node-telegram-bot-api";
-import OrderPriceCommentState from "./order-price-comment-state";
 
 
-const keyboardMarkup: Array<Array<KeyboardButton>> = [[{text: 'Вернуться в меню'}, {text: 'Назад'}]]
-export default class OrderSetPriceState extends InformatorBaseState {
-    private readonly order: Order
-    constructor(stateContext: InformatorStateContext, order: Order) {
-        super(stateContext);
-        this.order = order;
-    }
+export default class OrderSetPriceState extends InformatorOrderState {
 
     async onBackMessage(): Promise<any> {
         return this.stateContext.setState(new OrdersState(this.stateContext));
-    }
-
-    async sendMessage(message: string, options?: SendMessageOptions): Promise<Message> {
-        return super.sendMessage(message, options || {
-            reply_markup: {
-                keyboard: keyboardMarkup,
-                resize_keyboard: true,
-            },
-        })
     }
 
     async initState(): Promise<any> {

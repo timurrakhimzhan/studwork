@@ -3,9 +3,11 @@ export { default as AbstractBaseState } from '../abstract-base-state';
 
 export { default as AbstractOrdersState } from '../shared/abstract-orders-state';
 export { default as AbstractOrderRejectState } from './../shared/abstract-order-reject-state';
+export { default as AbstractOrderState } from '../shared/abstract-order-state';
 
 export { default as ReceiverBaseState } from './receiver-base-state';
 export { default as ReceiverStateContext } from './receiver-state-context';
+export { default as ReceiverOrderState } from './receiver-order-state';
 
 export { default as WelcomeState } from './welcome-state';
 export { default as MainMenuState } from './main-menu-state';
@@ -21,9 +23,9 @@ export { default as TimeInputState} from './time-input-state'
 export { default as PhoneInputState } from './phone-input-state';
 export { default as EmailInputState } from './email-input-state';
 export { default as ChooseContactOptionState } from './choose-contact-option-state';
-export { default as PaymentState} from './payment-state';
 
 export { default as OrdersState } from './orders-state';
 export { default as OrderRejectState } from './order-reject-state';
+export { default as OrderPaymentState } from './order-payment-state';
 
 

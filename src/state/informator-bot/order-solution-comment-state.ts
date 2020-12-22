@@ -1,22 +1,21 @@
-import {InformatorOrderState, OrdersState, OrderSetPriceState} from "./internal";
+import {InformatorOrderState, OrdersState, OrderUploadSolutionState} from "./internal";
 import {KeyboardButton, Message, SendMessageOptions} from "node-telegram-bot-api";
 import Status from "../../database/models/Status";
-import {STATUS_NOT_PAYED} from "../../constants";
-
+import {STATUS_FINISHED} from "../../constants";
 
 const keyboardMarkup: Array<Array<KeyboardButton>> = [[{text: 'Вернуться в меню'}, {text: 'Назад'}],
     [{text: 'Вернуться к списку заказов'}]];
 
-export default class OrderPriceCommentState extends InformatorOrderState {
+export default class OrderSolutionCommentState extends InformatorOrderState {
 
     async onBackMessage(): Promise<any> {
-        await this.resetOrderPrice();
-        return this.stateContext.setState(new OrderSetPriceState(this.stateContext, this.order))
+        await this.resetSolution();
+        return this.stateContext.setState(new OrderUploadSolutionState(this.stateContext, this.order))
     }
 
-    private async resetOrderPrice(): Promise<any> {
-        this.order.price = null;
-        this.order.priceComment = null;
+    private async resetSolution() {
+        this.order.solutionUrl = null;
+        this.order.solutionComment = null;
     }
 
     async sendMessage(message: string, options?: SendMessageOptions): Promise<Message> {
@@ -29,7 +28,7 @@ export default class OrderPriceCommentState extends InformatorOrderState {
     }
 
     async initState(): Promise<any> {
-        return this.stateContext.sendMessage( `Укажите комментарий к указанной Вам цене:`)
+        return this.stateContext.sendMessage('Оставьте комментарий к вашей работе:');
     }
 
     async messageController(message: Message): Promise<any> {
@@ -40,8 +39,8 @@ export default class OrderPriceCommentState extends InformatorOrderState {
         if(!message.text?.trim().length) {
             return stateContext.sendMessage('Комментарий должен содержать символы');
         }
-        this.order.priceComment = message.text;
-        const status = await Status.findOne({ where: {name: STATUS_NOT_PAYED }});
+        this.order.solutionComment = message.text;
+        const status = await Status.findOne({ where: {name: STATUS_FINISHED }});
         if(!status) {
             const stateContext = this.stateContext;
             await stateContext.sendMessage('Ошибка сервера, пожалуйста, повторите позже');
@@ -49,7 +48,9 @@ export default class OrderPriceCommentState extends InformatorOrderState {
         }
         await this.order.save();
         await this.order.$set('status', status);
-        await stateContext.sendMessage('Цена успешно установлена!');
+        await stateContext.sendMessage('Выполненное задание успешно загружено!');
         return stateContext.setState(new OrdersState(stateContext));
     }
+
+
 }

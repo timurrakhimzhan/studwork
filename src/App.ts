@@ -1,4 +1,4 @@
-import {connectInformatorBot, connectPayment, connectReceiverBot} from "./connections/connect-telegram-bots";
+import {connectInformatorBot, connectReceiverBot} from "./connections/connect-telegram-bots";
 import ReceiverBotContext from "./bot-contexts/receiver-bot";
 import InformatorBotContext from "./bot-contexts/informator-bot";
 

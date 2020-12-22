@@ -90,15 +90,15 @@ export async function fillTeachers() {
         name: 'Тимур Рахимжан',
         subjects,
     });
+    await admin.save();
     await admin.$set('subjects', subjects);
-    // await admin.save();
 
     const mathTeacher = await Teacher.create({
         mock: true,
         login: 'math',
         password: 'password',
         name: 'Матеатик Математиков',
-    })
+    });
+    await mathTeacher.save();
     await mathTeacher.$set('subjects', subjects.filter((subject) => subject.name === 'Математика'));
-    // await mathTeacher.save();
 }

@@ -59,10 +59,10 @@ export default class Order extends Model {
     solutionComment!: string | null;
 
     @Column({type: DataType.TEXT, allowNull: true})
-    rejectionClientComment!: string | null;
+    rejectionClientReason!: string | null;
 
     @Column({type: DataType.TEXT, allowNull: true})
-    rejectionTeacherComment!: string | null;
+    rejectionTeacherReason!: string | null;
 
     @Column({allowNull: false, defaultValue: false})
     mock!: boolean;

@@ -1,20 +1,22 @@
-import {ReceiverBaseState} from "./internal";
+import {ReceiverOrderState, TimeInputState, CommentInputState} from "./internal";
 import {CallbackQuery, Message, SendMessageOptions} from "node-telegram-bot-api";
 import CalendarInfo from "../../calendar";
-import {TimeInputState} from "./internal";
 
-class DateInputState extends ReceiverBaseState {
+class DateInputState extends ReceiverOrderState {
     private onDayChosen = async (year: number, month: number, day: number) => {
         const stateContext = this.stateContext;
         const date = new Date();
         date.setFullYear(year)
         date.setMonth(month - 1);
         date.setDate(day);
-        const order = stateContext.getOrder();
-        order.datetime = date;
-        await stateContext.setState(new TimeInputState(stateContext));
+        this.order.datetime = date;
+        await stateContext.setState(new TimeInputState(stateContext, this.order));
     }
     private calendarInfo = new CalendarInfo(this.stateContext.getBotContext().getBot(), this.onDayChosen);
+
+    async onBackMessage(): Promise<any> {
+        return this.stateContext.setState(new CommentInputState(this.stateContext, this.order))
+    }
 
     async sendMessage(message: string, options?: SendMessageOptions): Promise<Message> {
         return this.calendarInfo.sendCalendar(this.stateContext.getChatId(), message);

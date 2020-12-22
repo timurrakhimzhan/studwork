@@ -1,9 +1,8 @@
-import {ReceiverBaseState, ChooseWorkTypeState} from "./internal";
+import {MainMenuState, NameInputState, ChooseWorkTypeState, ReceiverOrderState} from "./internal";
 import {generateInlineMenu} from "../../utils/message-utils";
 import {CallbackQuery, Message, SendMessageOptions} from "node-telegram-bot-api";
-import MainMenuState from "./main-menu-state";
 
-class ChooseSubjectState extends ReceiverBaseState {
+class ChooseSubjectState extends ReceiverOrderState {
     async initState () {
         const stateContext = this.stateContext;
         const subjects = stateContext.getBotContext().getSubjects();
@@ -14,6 +13,10 @@ class ChooseSubjectState extends ReceiverBaseState {
         await stateContext.sendMessage('Выберите предмет:', {reply_markup: {
                 inline_keyboard: generateInlineMenu(this.stateContext.getBotContext().getSubjects())
             }});
+    }
+
+    async onBackMessage(): Promise<any> {
+        return this.stateContext.setState(new NameInputState(this.stateContext, this.order));
     }
 
     async callbackController(callback: CallbackQuery) {
@@ -28,15 +31,14 @@ class ChooseSubjectState extends ReceiverBaseState {
             await stateContext.sendMessage('Извините, произошла ошибка во время выбора предмета, пожалуйста, повторите попытку.')
             return stateContext.initState();
         }
-        const order = stateContext.getOrder();
-        order.subject = subjectFound;
+        this.order.subject = subjectFound;
         await bot.editMessageText(`Выбран предмет: *${callbackData}*.`, {
             chat_id: stateContext.getChatId(),
             message_id: message.message_id,
             parse_mode: 'Markdown',
             reply_markup: {inline_keyboard: []}
         });
-        await stateContext.setState(new ChooseWorkTypeState(stateContext));
+        await stateContext.setState(new ChooseWorkTypeState(stateContext, this.order));
 
     }
 }
