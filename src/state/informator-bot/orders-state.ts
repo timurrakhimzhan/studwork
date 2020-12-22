@@ -68,6 +68,7 @@ export default class OrdersState extends AbstractOrdersState {
                         model: Subject,
                     }]
                 }],
+                order: Sequelize.literal('"Order"."orderId" DESC'),
                 limit: 10,
                 offset: this.offset
             });
@@ -88,6 +89,7 @@ export default class OrdersState extends AbstractOrdersState {
                     model: Subject,
                 }]
             }],
+            order: Sequelize.literal('"Order"."orderId" DESC'),
             limit: 10,
             offset: this.offset
         });

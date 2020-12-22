@@ -38,6 +38,7 @@ export default class OrdersState extends AbstractOrdersState {
                     model: Subject,
                 }]
             }, Subject, ContactOption],
+            order: Sequelize.literal('"Order"."orderId" DESC'),
             limit: 10,
             offset: this.offset
         });
@@ -49,6 +50,7 @@ export default class OrdersState extends AbstractOrdersState {
                 [Sequelize.fn('count', Sequelize.col('orders.orderId')), 'ordersCount']
             ],
             group: 'Status.statusId',
+            order: Sequelize.literal('"Order"."orderId" DESC'),
             include: [{
                 model: Order, attributes: [], required: false,
                 where: {

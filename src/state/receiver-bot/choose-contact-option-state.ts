@@ -56,7 +56,12 @@ class ChooseContactOptionState extends ReceiverOrderState {
             order.$set('status', order.status),
             order.$set('teacher', order.teacher),
         ]);
-        await order.$get('workType', {include: [Subject]});
+        const workType = await order.$get('workType', {include: [Subject]});
+        if(!workType) {
+            await stateContext.sendMessage('Ошибка сервера, пожалуйста, повторите попытку позже.');
+            return stateContext.setState(new MainMenuState(stateContext));
+        }
+        order.workType = workType;
         await botContext.getBot().editMessageText(`Выбран вариант: *${callbackData}*.`, {
             chat_id: stateContext.getChatId(),
             message_id: message.message_id,

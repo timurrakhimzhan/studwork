@@ -11,8 +11,8 @@ export const generateSubjectsMessage = (subjects: Array<Subject>) => {
 }
 
 export const generatePriceList = (subject: Subject) => {
-    return `Прайс-лист (сумма может оказаться выше, взависимости от трудоемкости и сложности заданий):\n${subject.workTypes.map(workType => 
-        `${workType.name}: ${workType.SubjectWorkType?.minPrice}тг`).join('\n')}`
+    return `Прайс-лист (сумма может оказаться выше, в зависимости от трудоемкости и сложности заданий):\n${subject.workTypes.map(workType => 
+        `${workType.name}: *${workType.SubjectWorkType?.minPrice}тг*`).join('\n')}`
 }
 
 export const generateInlineMenu = (menuItems: Array<{name: string; callback?: string | null; url?: string | null}>): Array<Array<InlineKeyboardButton>> =>{
