@@ -9,12 +9,11 @@ class TimeInputState extends ReceiverBaseState {
 
     async messageController(message: Message): Promise<any> {
         const stateContext = this.stateContext;
-        const botContext = stateContext.getBotContext();
         const time = moment(message.text || '', 'HH:mm');
         if(!time.isValid() || !message.text?.includes(':')) {
             return this.stateContext.sendMessage('Неверный формат времени. *Пример корректного формата: 14:30*');
         }
-        const order = botContext.getOrderInfo(stateContext.getChatId());
+        const order = stateContext.getOrder();
         order.datetime.setHours(time.hours());
         order.datetime.setMinutes(time.minutes());
         await stateContext.setState(new PhoneInputState(stateContext));

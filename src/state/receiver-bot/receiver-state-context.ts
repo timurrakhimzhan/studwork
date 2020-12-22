@@ -1,9 +1,18 @@
-import {MainMenuState, AbstractStateContext} from "./internal";
+import {MainMenuState, AbstractStateContext, WelcomeState} from "./internal";
 import {Message} from "node-telegram-bot-api";
 import ReceiverBotContext from "../../bot-contexts/receiver-bot";
+import Order from "../../database/models/Order";
 
 export default class ReceiverStateContext extends AbstractStateContext {
     protected readonly botContext: ReceiverBotContext;
+    private order: Order;
+
+    getOrder = (): Order => this.order;
+
+    resetOrder = () => {
+        this.order = new Order();
+    }
+
 
     getBotContext() {
         return this.botContext;
@@ -12,7 +21,8 @@ export default class ReceiverStateContext extends AbstractStateContext {
     constructor(botContext: ReceiverBotContext, chatId: number) {
         super(botContext, chatId);
         this.botContext = botContext;
-        this.state = new MainMenuState(this);
+        this.state = new WelcomeState(this);
+        this.order = new Order();
     }
 
     public async messageController(message: Message) {
@@ -26,9 +36,8 @@ export default class ReceiverStateContext extends AbstractStateContext {
         if(message.text?.trim() === '/start') {
             botContext.setFeedbackGiven(this.getChatId(), false);
             botContext.resetFeedback(this.getChatId());
-            botContext.resetOrderInfo(this.getChatId());
-            await this.sendMessage('Добрый день! Вас приветствует компания StudWork!');
-            return this.setState(new MainMenuState(this));
+            this.resetOrder();
+            await this.setState(new WelcomeState(this))
         }
         return super.messageController(message);
     }

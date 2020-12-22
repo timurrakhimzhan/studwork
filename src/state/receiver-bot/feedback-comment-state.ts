@@ -1,6 +1,5 @@
 import {ReceiverBaseState, MainMenuState} from "./internal";
 import {CallbackQuery, Message, PreCheckoutQuery} from "node-telegram-bot-api";
-import {addFeedback} from "../../controllers/google-spreadsheet-controller";
 
 class FeedbackCommentState extends ReceiverBaseState {
 

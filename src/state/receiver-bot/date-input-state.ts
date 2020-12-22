@@ -1,18 +1,16 @@
 import {ReceiverBaseState} from "./internal";
 import {CallbackQuery, Message, SendMessageOptions} from "node-telegram-bot-api";
 import CalendarInfo from "../../calendar";
-import moment from 'moment';
 import {TimeInputState} from "./internal";
 
 class DateInputState extends ReceiverBaseState {
     private onDayChosen = async (year: number, month: number, day: number) => {
         const stateContext = this.stateContext;
-        const botContext = stateContext.getBotContext();
         const date = new Date();
         date.setFullYear(year)
         date.setMonth(month - 1);
         date.setDate(day);
-        const order = botContext.getOrderInfo(stateContext.getChatId());
+        const order = stateContext.getOrder();
         order.datetime = date;
         await stateContext.setState(new TimeInputState(stateContext));
     }

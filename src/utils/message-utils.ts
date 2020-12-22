@@ -1,5 +1,6 @@
 import {InlineKeyboardButton, KeyboardButton} from "node-telegram-bot-api";
 import Subject from "../database/models/Subject";
+import axios from "axios";
 
 export const generateSubjectsMessage = (subjects: Array<Subject>) => {
     return `Список доступных предметов:\n${subjects.map(subject => '• ' + subject.name).join('\n')}`;
@@ -35,4 +36,9 @@ export const generateKeyboardMenu = (menuItems: Array<{name: string}>): Array<Ar
         markup.push(buttons.splice(0, 2));
     }
     return markup;
+}
+
+export const getBufferFromUrl = async(url: string): Promise<Buffer> => {
+    const response = await axios.get(url, {responseType: 'arraybuffer'});
+    return Buffer.from(response.data, 'binary');
 }

@@ -8,8 +8,8 @@ class App {
     private informatorBotContext: InformatorBotContext | null = null;
 
     public init = async () => {
-        const receiverBot = await connectReceiverBot();
-        const informatorBot = await connectInformatorBot();
+        const receiverBot = connectReceiverBot();
+        const informatorBot = connectInformatorBot();
         this.receiverBotContext = new ReceiverBotContext(receiverBot);
         this.informatorBotContext = new InformatorBotContext(informatorBot);
     }

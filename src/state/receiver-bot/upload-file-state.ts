@@ -27,7 +27,7 @@ class UploadFileState extends ReceiverBaseState {
             await stateContext.sendMessage('Ошибка ввода. Нужно прикрепить фотографию/документ/архив, либо указать тему работы, пожалуйста, повторите попытку.');
             return;
         }
-        const order: Order = botContext.getOrderInfo(stateContext.getChatId());
+        const order: Order = stateContext.getOrder();
         order.topic = topic;
         order.assignmentUrl = url;
         await stateContext.setState(new CommentInputState(stateContext));

@@ -32,8 +32,7 @@ class PaymentState extends ReceiverBaseState {
             await stateContext.sendMessage('Произошла ошибка во время оплаты.');
             return;
         }
-        const botContext = stateContext.getBotContext();
-        const order = botContext.getOrderInfo(stateContext.getChatId());
+        const order = stateContext.getOrder();
         await stateContext.sendMessage('Оплата прошла успешно, мы с Вами свяжемся.');
         await stateContext.setState(new MainMenuState(stateContext));
         // await informatorSendMessage(botContext, order.getReceipt());

@@ -2,36 +2,24 @@ import TelegramBot from 'node-telegram-bot-api';
 import {readFile} from "../utils/io";
 
 
-export async function connectReceiverBot(): Promise<TelegramBot> {
-    try{
-        const receiverToken: string = process.env['TG_RECEIVER_BOT'] as string;
-        // const { receiverToken } = await readFile('./src/configs/bot-tokens.json') as {receiverToken: string};
-        if(!receiverToken) {
-            console.error('Receiver token is incorrect');
-            process.exit(0);
-        }
-        return new TelegramBot(receiverToken, {polling: true})
-    } catch(error) {
-        console.error(error);
+export function connectReceiverBot(): TelegramBot {
+    const receiverToken: string = process.env['TG_RECEIVER_BOT'] as string;
+    // const { receiverToken } = await readFile('./src/configs/bot-tokens.json') as {receiverToken: string};
+    if(!receiverToken) {
+        console.error('Receiver token is incorrect');
         process.exit(0);
     }
-
+    return new TelegramBot(receiverToken, {polling: true})
 }
 
-export async function connectInformatorBot(): Promise<TelegramBot> {
-    try {
-        const informatorToken: string = process.env['TG_INFORMATOR_BOT'] as string;
-        // const { informatorToken } = await readFile('./src/configs/bot-tokens.json') as {informatorToken: string};
-        if(!informatorToken) {
-            console.error('Informator token is incorrect');
-            process.exit(0);
-        }
-        return new TelegramBot(informatorToken, {polling: false})
-    } catch (error) {
-        console.error(error);
+export function connectInformatorBot(): TelegramBot {
+    const informatorToken: string = process.env['TG_INFORMATOR_BOT'] as string;
+    // const { informatorToken } = await readFile('./src/configs/bot-tokens.json') as {informatorToken: string};
+    if(!informatorToken) {
+        console.error('Informator token is incorrect');
         process.exit(0);
     }
-
+    return new TelegramBot(informatorToken, {polling: true})
 }
 
 export async function connectPayment(): Promise<void> {

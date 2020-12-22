@@ -19,7 +19,7 @@ export default class ReceiptGenerator {
             `Статус заказа: *${statusMeaningMap[order.status.name]}*`;
     }
 
-    public static getReceiptForTeacher = (order: Order) => {
+    public static generateReceiptForTeacher = (order: Order) => {
         const userName = order.username ? '@' + order.username : '*Юзернейм не указан*';
         const date = moment(order.datetime).format('DD-MM-YYYY');
         const time = moment(order.datetime).format('HH:mm');

@@ -15,7 +15,7 @@ class PhoneInputState extends ReceiverBaseState {
             return;
         }
         const botContext = this.stateContext.getBotContext();
-        const order = botContext.getOrderInfo(stateContext.getChatId());
+        const order = stateContext.getOrder();
         order.phone = message.text as string;
         await stateContext.setState(new EmailInputState(stateContext));
     }

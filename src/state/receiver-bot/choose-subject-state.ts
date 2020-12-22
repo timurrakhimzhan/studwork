@@ -1,5 +1,5 @@
 import {ReceiverBaseState, ChooseWorkTypeState} from "./internal";
-import {generateInlineMenu} from "../../utils/tg-utils";
+import {generateInlineMenu} from "../../utils/message-utils";
 import {CallbackQuery, Message, SendMessageOptions} from "node-telegram-bot-api";
 import MainMenuState from "./main-menu-state";
 
@@ -28,7 +28,7 @@ class ChooseSubjectState extends ReceiverBaseState {
             await stateContext.sendMessage('Извините, произошла ошибка во время выбора предмета, пожалуйста, повторите попытку.')
             return this.initState();
         }
-        const order = botContext.getOrderInfo(stateContext.getChatId());
+        const order = stateContext.getOrder();
         order.subject = subjectFound;
         await bot.editMessageText(`Выбран предмет: *${callbackData}*.`, {
             chat_id: stateContext.getChatId(),

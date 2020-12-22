@@ -1,4 +1,4 @@
-import {Table, Model, Column, HasMany, BelongsToMany} from "sequelize-typescript";
+import {Table, Model, Column, HasMany, BelongsToMany, DataType} from "sequelize-typescript";
 import Order from "./Order";
 import Subject from "./Subject";
 import SubjectTeacher from "./SubjectTeacher";
@@ -14,8 +14,8 @@ export default class Teacher extends Model {
     @Column({allowNull: false})
     password!: string;
 
-    @Column({allowNull: true})
-    chatId!: number;
+    @Column({type: DataType.INTEGER,allowNull: true})
+    chatId!: number | null;
 
     @Column({allowNull: false, defaultValue: false})
     isAdmin!: boolean;

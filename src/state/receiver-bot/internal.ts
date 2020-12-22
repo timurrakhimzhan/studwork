@@ -6,6 +6,7 @@ export { default as AbstractOrdersState } from '../shared/abstract-orders-state'
 export { default as ReceiverBaseState } from './receiver-base-state';
 export { default as ReceiverStateContext } from './receiver-state-context';
 
+export { default as WelcomeState } from './welcome-state';
 export { default as MainMenuState } from './main-menu-state';
 export { default as FeedbackEvaluateState } from './feedback-evaluate-state';
 export { default as FeedbackCommentState } from './feedback-comment-state';

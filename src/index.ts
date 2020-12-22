@@ -31,13 +31,10 @@ const app = async () => {
     await app.getReceiverBotContext().init();
     console.log('Initialization is finished');
 
-    // const teacher = new Teacher();
-    // teacher.login = 'admin';
-    // const teachers = await Teacher.findAll({ where: {login: teacher.login} });
-
     await initSubjectsPolling(app.getReceiverBotContext());
 
     const receiverBot = app.getReceiverBotContext().getBot();
+    const informatorBot = app.getInformatorBotContext().getBot();
 
     receiverBot.on('message', (msg) => {
         return app.getReceiverBotContext().getChatStateContext(msg.chat.id).messageController(msg);
@@ -51,6 +48,17 @@ const app = async () => {
     receiverBot.on('pre_checkout_query', (preCq) => {
         return receiverBot.answerPreCheckoutQuery(preCq.id, true);
     })
+
+    informatorBot.on('message', (msg) => {
+        return app.getInformatorBotContext().getChatStateContext(msg.chat.id).messageController(msg);
+    });
+
+    informatorBot.on('callback_query', (cb) => {
+        if(!cb.message || !cb.data) {
+            return;
+        }
+        return app.getInformatorBotContext().getChatStateContext(cb.message?.chat.id).callbackController(cb);
+    });
 
 };
 

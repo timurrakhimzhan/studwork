@@ -17,8 +17,7 @@ class EmailInputState extends ReceiverBaseState {
             await stateContext.sendMessage('Некорректный адрес электронной почты, пожалуйста, повторите попытку.')
             return;
         }
-        const botContext = stateContext.getBotContext();
-        const order = botContext.getOrderInfo(stateContext.getChatId());
+        const order = stateContext.getOrder();
         order.email = message.text;
 
         await stateContext.setState(new ChooseContactOptionState(stateContext))

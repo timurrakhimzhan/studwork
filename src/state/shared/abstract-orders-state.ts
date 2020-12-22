@@ -1,8 +1,9 @@
 import Status, {statuses, statusMeaningMap, StatusName} from "../../database/models/Status";
 import Order from "../../database/models/Order";
-import {CallbackQuery, Message, SendMessageOptions} from "node-telegram-bot-api";
-import {generateKeyboardMenu} from "../../utils/tg-utils";
+import {CallbackQuery, InlineKeyboardButton, Message, SendMessageOptions} from "node-telegram-bot-api";
+import {generateKeyboardMenu} from "../../utils/message-utils";
 import {AbstractBaseState} from "../internal";
+import ReceiptGenerator from "../../utils/ReceiptGenerator";
 
 export default abstract class AbstractOrdersState extends AbstractBaseState {
     protected statusOrders: {[T in StatusName]?: Array<Order>} = {}
@@ -35,6 +36,8 @@ export default abstract class AbstractOrdersState extends AbstractBaseState {
 
     protected abstract getStatusCounts(): Promise<Array<Status>>;
     protected abstract getOrders(): Promise<Array<Order>>;
+    protected abstract generateReceipt(): string;
+    protected abstract generateExtraInlineMarkup(): Array<Array<InlineKeyboardButton>>;
 
     protected async fetchReceipts(status: StatusName) {
         if(!this.statusOrders[status]) {
@@ -50,7 +53,44 @@ export default abstract class AbstractOrdersState extends AbstractBaseState {
         }
     }
 
-    protected abstract showReceipt(editCurrentMessage?: boolean): Promise<void>;
+    protected async showReceipt(editCurrentMessage?: boolean): Promise<void> {
+        if(!this.currentStatus) {
+            return;
+        }
+        const stateContext = this.stateContext;
+        const bot = stateContext.getBotContext().getBot();
+        let inlineMarkup: Array<Array<InlineKeyboardButton>> = [[{text: '⬅️ Назад', callback_data: 'Назад'}, {text: 'Вперед ➡️', callback_data: 'Вперед'}]]
+        if(this.statusCount[this.currentStatus] === 0) {
+            return stateContext.sendMessage('Список заказов пуст.');
+        }
+        if(this.currentOrderPosition === 0) {
+            inlineMarkup[0].shift();
+        }
+        if(this.currentOrderPosition + 1 === this.statusCount[this.currentStatus]) {
+            inlineMarkup[0].pop();
+        }
+        await this.fetchReceipts(this.currentStatus);
+        const receipt = this.generateReceipt();
+        const inlineMenu = this.generateExtraInlineMarkup()
+        inlineMarkup = [...inlineMarkup, ...inlineMenu];
+        if(editCurrentMessage) {
+            await bot.editMessageText(receipt, {
+                chat_id: stateContext.getChatId(),
+                message_id: stateContext.getLastMessageId() as number,
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: inlineMarkup
+                }
+            })
+        } else {
+            await stateContext.sendMessage(receipt, {
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: inlineMarkup
+                }
+            })
+        }
+    }
 
     async messageController(message: Message): Promise<any> {
         const statusChosen = statuses.find((status) => message.text?.includes(statusMeaningMap[status]));

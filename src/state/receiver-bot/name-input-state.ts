@@ -12,12 +12,11 @@ class NameInputState extends ReceiverBaseState {
             return;
         }
         const stateContext = this.stateContext;
-        const botContext = stateContext.getBotContext();
-        const order = botContext.getOrderInfo(stateContext.getChatId());
+        const order = stateContext.getOrder();
         order.clientName = message.text;
         order.username = message.chat.username || 'Юзернейм не указан';
         order.chatId = message.chat.id;
-        await this.stateContext.setState(new ChooseSubjectState(stateContext));
+        await stateContext.setState(new ChooseSubjectState(stateContext));
     }
 
 

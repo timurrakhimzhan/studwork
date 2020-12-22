@@ -8,12 +8,14 @@ import Subject from "../../database/models/Subject";
 import WorkType from "../../database/models/WorkType";
 import ContactOption from "../../database/models/ContactOption";
 import axios from "axios";
+import {getBufferFromUrl} from "../../utils/message-utils";
 
 export default class OrdersState extends AbstractOrdersState {
     protected getOrders(): Promise<Array<Order>> {
         return Order.findAll({
             where: {
-                chatId: this.stateContext.getChatId()
+                chatId: this.stateContext.getChatId(),
+                mock: !!process.env['MOCK'],
             },
             include: [Subject, Status, WorkType, ContactOption],
             limit: 10,
@@ -27,49 +29,34 @@ export default class OrdersState extends AbstractOrdersState {
                 [Sequelize.fn('count', Sequelize.col('orders.orderId')), 'ordersCount']
             ],
             group: 'Status.statusId',
-            include: [{ model: Order, attributes: [], where: { chatId: this.stateContext.getChatId() }, required: false,}],
+            include: [{
+                model: Order, attributes: [], required: false,
+                where: {
+                    chatId: this.stateContext.getChatId(),
+                    mock: !!process.env['MOCK'],
+                },
+            }],
         });
     }
 
-    protected async showReceipt(editCurrentMessage?: boolean): Promise<void> {
+    protected generateReceipt(): string {
         if(!this.currentStatus) {
-            return;
+            return "";
         }
-        const stateContext = this.stateContext;
-        const bot = stateContext.getBotContext().getBot();
-        let inlineMarkup = [[{text: '⬅️ Назад', callback_data: 'Назад'}, {text: 'Вперед ➡️', callback_data: 'Вперед'}]]
-        if(this.statusCount[this.currentStatus] === 0) {
-            return stateContext.sendMessage('Список заказов пуст.');
-        }
-        if(this.currentOrderPosition === 0) {
-            inlineMarkup[0].shift();
-        }
-        if(this.currentOrderPosition + 1 === this.statusCount[this.currentStatus]) {
-            inlineMarkup[0].pop();
-        }
-        await this.fetchReceipts(this.currentStatus);
         const orders = this.statusOrders[this.currentStatus] as Array<Order>
-        const receipt = ReceiptGenerator.generateReceiptForClient(orders[this.currentOrderPosition]);
+        return ReceiptGenerator.generateReceiptForClient(orders[this.currentOrderPosition]);
+    }
+
+    protected generateExtraInlineMarkup(): Array<Array<InlineKeyboardButton>> {
+        const extraInlineMarkup: Array<Array<InlineKeyboardButton>> = []
+        if(!this.currentStatus) {
+            return extraInlineMarkup;
+        }
+        const orders = this.statusOrders[this.currentStatus] as Array<Order>
         if(orders[this.currentOrderPosition].assignmentUrl) {
-            inlineMarkup.push([{text: 'Показать прикрепленный файл', callback_data: 'Показать прикрепленный файл'}])
+            extraInlineMarkup.push([{text: 'Показать прикрепленный файл', callback_data: 'Показать прикрепленный файл'}])
         }
-        if(editCurrentMessage) {
-            await bot.editMessageText(receipt, {
-                chat_id: stateContext.getChatId(),
-                message_id: stateContext.getLastMessageId() as number,
-                parse_mode: 'Markdown',
-                reply_markup: {
-                    inline_keyboard: inlineMarkup
-                }
-            })
-        } else {
-            await stateContext.sendMessage(receipt, {
-                parse_mode: 'Markdown',
-                reply_markup: {
-                    inline_keyboard: inlineMarkup
-                }
-            })
-        }
+        return extraInlineMarkup;
     }
 
     async callbackController(callback: CallbackQuery): Promise<any> {
@@ -83,10 +70,9 @@ export default class OrdersState extends AbstractOrdersState {
             const orders = this.statusOrders[this.currentStatus] as Array<Order>
             const url = orders[this.currentOrderPosition].assignmentUrl;
             if(url) {
-                const response = await axios.get(url, {responseType: 'arraybuffer'});
-                const document = Buffer.from(response.data, 'binary')
+                const document = await getBufferFromUrl(url);
                 await bot.sendDocument(stateContext.getChatId(), document, {}, {
-                    filename: 'Заказ#' + orders[this.currentOrderPosition].orderId,
+                    filename: 'Прикрепленный файл к заказу #' + orders[this.currentOrderPosition].orderId,
                 });
                 await bot.answerCallbackQuery(callback.id);
             }

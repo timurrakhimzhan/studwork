@@ -1,5 +1,19 @@
-import {InformatorBaseState} from "./internal";
+import {InformatorBaseState, PasswordInputState} from "./internal";
+import {Message} from "node-telegram-bot-api";
 
 export default class LoginInputState extends InformatorBaseState {
+    async initState(): Promise<any> {
+        return this.stateContext.sendMessage('Введите логин:');
+    }
 
+
+    async messageController(message: Message): Promise<any> {
+        const stateContext = this.stateContext;
+        if(!message.text?.trim().length) {
+            return stateContext.sendMessage('Логин не должен быть пустым');
+        }
+        const teacher = stateContext.getTeacher();
+        teacher.login = message.text;
+        await stateContext.setState(new PasswordInputState(stateContext));
+    }
 }

@@ -12,8 +12,7 @@ class CommentInputState extends ReceiverBaseState {
               await stateContext.sendMessage('Комментарий не должен быть пустым.');
               return;
         }
-        const botContext = stateContext.getBotContext();
-        const order = botContext.getOrderInfo(stateContext.getChatId());
+        const order = stateContext.getOrder();
         order.comment = message.text as string;
         await stateContext.setState(new DateInputState(stateContext));
     }

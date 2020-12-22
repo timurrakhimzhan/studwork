@@ -5,7 +5,7 @@ import {
     Message,
     SendMessageOptions,
 } from "node-telegram-bot-api";
-import {generateInlineMenu, generatePriceList, generateSubjectsMessage} from "../../utils/tg-utils";
+import {generateInlineMenu, generatePriceList, generateSubjectsMessage} from "../../utils/message-utils";
 import {OrdersState} from "./internal";
 
 const mainMenu: Array<Array<KeyboardButton>> =  [
@@ -46,12 +46,15 @@ class MainMenuState extends ReceiverBaseState {
             }
         }
         if(message.text?.trim() === 'Заказать работу') {
+            stateContext.resetOrder();
+            const order = stateContext.getOrder();
+            order.mock = !!process.env['MOCK'];
             return stateContext.setState(new NameInputState(stateContext));
         }
         if(message.text?.trim() === 'Мои заказы') {
             return stateContext.setState(new OrdersState(stateContext));
         }
-        await this.stateContext.sendMessage('Выберите интересующую вас тему:');
+        await this.stateContext.initState();
     }
 
     async callbackController(callback: CallbackQuery): Promise<any> {

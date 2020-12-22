@@ -6,10 +6,6 @@ import {
 } from "node-telegram-bot-api";
 import {AbstractStateContext} from "./internal";
 
-const backMenu: Array<Array<KeyboardButton>> = [
-    [{text: 'Вернуться в меню'}],
-];
-
 abstract class AbstractBaseState {
     public stateContext: AbstractStateContext;
 
@@ -19,11 +15,7 @@ abstract class AbstractBaseState {
 
     async sendMessage(message: string, options?: SendMessageOptions): Promise<Message> {
         return this.stateContext.getBotContext().getBot().sendMessage(this.stateContext.getChatId(), message, options || {
-            reply_markup: {
-                keyboard: backMenu,
-                resize_keyboard: true,
-            },
-            parse_mode: 'Markdown',
+            parse_mode: 'Markdown'
         });
     }
 

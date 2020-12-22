@@ -1,6 +1,6 @@
 import {ReceiverBaseState} from "./internal";
 import {CallbackQuery, Message} from "node-telegram-bot-api";
-import {generateInlineMenu} from "../../utils/tg-utils";
+import {generateInlineMenu} from "../../utils/message-utils";
 import MainMenuState from "./main-menu-state";
 import ReceiptGenerator from "../../utils/ReceiptGenerator";
 import Status from "../../database/models/Status";
@@ -21,7 +21,7 @@ class ChooseContactOptionState extends ReceiverBaseState {
         const callbackData = callback.data as string;
         const stateContext = this.stateContext;
         const botContext = stateContext.getBotContext();
-        const order = botContext.getOrderInfo(stateContext.getChatId());
+        const order = stateContext.getOrder();
         const contactOptionFound = botContext.getContactOptions().find((contactOption) => contactOption.callback === callbackData);
         const statusPriceNotAssigned = await Status.findOne({where: {
                 name: 'STATUS_PRICE_NOT_ASSIGNED'
