@@ -4,9 +4,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "tsc",
     "start": "node --icu-data-dir=node_modules/full-icu ./dist/index.js",
-    "mock": "MOCK=true node --icu-data-dir=node_modules/full-icu ./dist/index.js"
+    "mock": "tsc && MOCK=true node --icu-data-dir=node_modules/full-icu ./dist/index.js"
   },
   "author": "",
   "license": "ISC",

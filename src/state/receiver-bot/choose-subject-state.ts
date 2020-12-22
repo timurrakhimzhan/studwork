@@ -26,7 +26,7 @@ class ChooseSubjectState extends ReceiverBaseState {
         await bot.answerCallbackQuery(callback.id);
         if(!subjectFound) {
             await stateContext.sendMessage('Извините, произошла ошибка во время выбора предмета, пожалуйста, повторите попытку.')
-            return this.initState();
+            return stateContext.initState();
         }
         const order = stateContext.getOrder();
         order.subject = subjectFound;

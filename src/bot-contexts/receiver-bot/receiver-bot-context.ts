@@ -5,6 +5,7 @@ import Subject from "../../database/models/Subject";
 import Order from "../../database/models/Order";
 import ContactOption from "../../database/models/ContactOption";
 import Contact from "../../database/models/Contact";
+import WorkType from "../../database/models/WorkType";
 
 export default class ReceiverBotContext extends AbstractBotContext {
     private subjects: Array<Subject> = []
@@ -32,7 +33,7 @@ export default class ReceiverBotContext extends AbstractBotContext {
     fetchSubjects = async () => {
         this.subjects = await Subject.findAll({
             where: {mock: !!process.env['MOCK']},
-            include: ['workTypes']
+            include: [WorkType]
         });
     }
 

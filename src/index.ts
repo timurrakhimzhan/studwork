@@ -9,6 +9,10 @@ import Order from "./database/models/Order";
 import Status from "./database/models/Status";
 import {Sequelize} from "sequelize-typescript";
 import Teacher from "./database/models/Teacher";
+import WorkType from "./database/models/WorkType";
+import ContactOption from "./database/models/ContactOption";
+import {STATUS_PRICE_NOT_ASSIGNED, STATUS_REJECTED_BY_CLIENT} from "./constants";
+import Subject from "./database/models/Subject";
 dotenv.config();
 
 

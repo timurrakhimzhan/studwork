@@ -27,11 +27,16 @@ abstract class AbstractStateContext {
     public getLastMessageId = () => this.lastMessageId;
 
     public sendMessage = async (message: string, options?: SendMessageOptions) => {
+        await this.state.onNewMessage();
         const {message_id} = await this.state.sendMessage(message, options);
         this.lastMessageId = message_id;
     }
 
     async messageController(message: Message) {
+        await this.state.onNewMessage();
+        if(message.text?.trim() === 'Назад') {
+            return this.state.onBackMessage();
+        }
         return this.state.messageController(message);
     }
 

@@ -1,4 +1,4 @@
-import {AbstractOrdersState, InformatorBaseState, InformatorStateContext} from "./internal";
+import {AbstractOrdersState, InformatorBaseState, InformatorStateContext, OrderRejectState} from "./internal";
 import Status from "../../database/models/Status";
 import {Sequelize} from "sequelize-typescript";
 import Order from "../../database/models/Order";
@@ -9,6 +9,13 @@ import ContactOption from "../../database/models/ContactOption";
 import ReceiptGenerator from "../../utils/ReceiptGenerator";
 import {CallbackQuery, InlineKeyboardButton} from "node-telegram-bot-api";
 import {getBufferFromUrl} from "../../utils/message-utils";
+import {
+    CALLBACK_CLIENT_FILE,
+    CALLBACK_SET_PRICE, CALLBACK_TEACHER_REJECT,
+    STATUS_NOT_PAYED,
+    STATUS_PRICE_NOT_ASSIGNED
+} from "../../constants";
+import OrderSetPriceState from "./order-set-price-state";
 
 export default class OrdersState extends AbstractOrdersState {
     stateContext: InformatorStateContext;
@@ -53,15 +60,34 @@ export default class OrdersState extends AbstractOrdersState {
         const teacher = this.stateContext.getTeacher();
         if(teacher.isAdmin) {
             return Order.findAll({
-                include: [Subject, Status, WorkType, ContactOption],
+                include: [Subject, ContactOption, Teacher, {
+                    model: Status,
+                    where: { name: this.currentStatus },
+                }, {
+                    model: WorkType,
+                    include: [{
+                        model: Subject,
+                    }]
+                }],
                 limit: 10,
                 offset: this.offset
             });
         }
         return Order.findAll({
-            include: [Subject, Status, WorkType, ContactOption, {
+            include: [Subject, ContactOption,
+            {
+                model: Status,
+                where: { name: this.currentStatus },
+            },
+            {
                 model: Teacher,
                 where: {teacherId: teacher.teacherId}
+            },
+            {
+                model: WorkType,
+                include: [{
+                    model: Subject,
+                }]
             }],
             limit: 10,
             offset: this.offset
@@ -82,9 +108,16 @@ export default class OrdersState extends AbstractOrdersState {
             return extraInlineMarkup;
         }
         const orders = this.statusOrders[this.currentStatus] as Array<Order>
-        if(orders[this.currentOrderPosition].assignmentUrl) {
-            extraInlineMarkup.push([{text: 'Показать прикрепленный клиентом файл', callback_data: 'Файл клиента'}])
+        const order = orders[this.currentOrderPosition];
+        if(order.assignmentUrl) {
+            extraInlineMarkup.push([{text: 'Показать прикрепленный клиентом файл', callback_data: CALLBACK_CLIENT_FILE}])
         }
+        if(order.status.name === STATUS_PRICE_NOT_ASSIGNED) {
+            extraInlineMarkup.push([{text: 'Установить цену', callback_data: CALLBACK_SET_PRICE}])
+            extraInlineMarkup.push([{text: 'Отменить заказ', callback_data: CALLBACK_TEACHER_REJECT}])
+        }
+
+
         return extraInlineMarkup;
     }
 
@@ -95,9 +128,11 @@ export default class OrdersState extends AbstractOrdersState {
         if(!this.currentStatus) {
             return;
         }
-        if(callbackData === 'Файл клиента') {
+        const orders = this.statusOrders[this.currentStatus] as Array<Order>
+        const order = orders[this.currentOrderPosition];
+        if(callbackData === CALLBACK_CLIENT_FILE) {
             const orders = this.statusOrders[this.currentStatus] as Array<Order>
-            const url = orders[this.currentOrderPosition].assignmentUrl;
+            const url = order.assignmentUrl;
             if(url) {
                 const document = await getBufferFromUrl(url);
                 await bot.sendDocument(stateContext.getChatId(), document, {}, {
@@ -105,6 +140,12 @@ export default class OrdersState extends AbstractOrdersState {
                 });
                 await bot.answerCallbackQuery(callback.id);
             }
+        }
+        if(callbackData === CALLBACK_SET_PRICE) {
+            await stateContext.setState(new OrderSetPriceState(stateContext, order));
+        }
+        if(callbackData === CALLBACK_TEACHER_REJECT) {
+            await stateContext.setState(new OrderRejectState(stateContext, order));
         }
         return super.callbackController(callback);
     }

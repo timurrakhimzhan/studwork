@@ -27,9 +27,6 @@ export default class ReceiverStateContext extends AbstractStateContext {
 
     public async messageController(message: Message) {
         const botContext = this.getBotContext();
-        try {
-            await this.state.onNewMessage();
-        } catch(e) {}
         if(message.text?.trim() === 'Вернуться в меню') {
             return this.setState(new MainMenuState(this));
         }

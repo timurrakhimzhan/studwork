@@ -19,4 +19,6 @@ export default class WorkType extends Model {
 
     @BelongsToMany(() => Subject, () => SubjectWorkType)
     subjects!: Array<Subject>
+
+    SubjectWorkType?: SubjectWorkType;
 }

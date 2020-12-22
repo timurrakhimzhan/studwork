@@ -1,6 +1,6 @@
 import Contact from "../models/Contact";
 import ContactOption from "../models/ContactOption";
-import Status from "../models/Status";
+import Status, {statuses} from "../models/Status";
 import Subject from "../models/Subject";
 import WorkType from "../models/WorkType";
 import SubjectWorkType from "../models/SubjectWorkType";
@@ -41,12 +41,7 @@ export async function fillContacts() {
 export async function fillStatuses() {
     const statusesCount = await Status.count();
     if(!statusesCount) {
-        return Status.bulkCreate([
-            {name: 'STATUS_PRICE_NOT_ASSIGNED'},
-            {name: 'STATUS_NOT_PAYED'},
-            {name: 'STATUS_PAYED'},
-            {name: 'STATUS_FINISHED'}
-        ]);
+        return Status.bulkCreate(statuses.map((status) => ({name: status})));
     }
 }
 

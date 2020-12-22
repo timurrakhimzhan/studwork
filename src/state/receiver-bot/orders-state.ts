@@ -9,15 +9,40 @@ import WorkType from "../../database/models/WorkType";
 import ContactOption from "../../database/models/ContactOption";
 import axios from "axios";
 import {getBufferFromUrl} from "../../utils/message-utils";
+import {
+    CALLBACK_CLIENT_FILE,
+    CALLBACK_CLIENT_REJECT,
+    STATUS_NOT_PAYED,
+    STATUS_PRICE_NOT_ASSIGNED
+} from "../../constants";
+import OrderRejectState from "./order-reject-state";
+import ReceiverStateContext from "./receiver-state-context";
 
 export default class OrdersState extends AbstractOrdersState {
+    stateContext: ReceiverStateContext;
+
+    constructor(stateContext: ReceiverStateContext) {
+        super(stateContext);
+        this.stateContext = stateContext;
+    }
+
     protected getOrders(): Promise<Array<Order>> {
         return Order.findAll({
             where: {
                 chatId: this.stateContext.getChatId(),
                 mock: !!process.env['MOCK'],
             },
-            include: [Subject, Status, WorkType, ContactOption],
+            include: [{
+                model: Status,
+                where: {
+                    name: this.currentStatus
+                },
+            }, {
+                model: WorkType,
+                include: [{
+                    model: Subject,
+                }]
+            }, Subject, ContactOption],
             limit: 10,
             offset: this.offset
         });
@@ -53,9 +78,14 @@ export default class OrdersState extends AbstractOrdersState {
             return extraInlineMarkup;
         }
         const orders = this.statusOrders[this.currentStatus] as Array<Order>
-        if(orders[this.currentOrderPosition].assignmentUrl) {
-            extraInlineMarkup.push([{text: 'Показать прикрепленный файл', callback_data: 'Показать прикрепленный файл'}])
+        const order = orders[this.currentOrderPosition];
+        if(order.assignmentUrl) {
+            extraInlineMarkup.push([{text: 'Показать прикрепленный файл', callback_data: CALLBACK_CLIENT_FILE}])
         }
+        if(order.status.name === STATUS_PRICE_NOT_ASSIGNED || order.status.name === STATUS_NOT_PAYED) {
+            extraInlineMarkup.push([{text: 'Отменить заказ', callback_data: CALLBACK_CLIENT_REJECT}])
+        }
+
         return extraInlineMarkup;
     }
 
@@ -66,16 +96,20 @@ export default class OrdersState extends AbstractOrdersState {
         if(!this.currentStatus) {
             return;
         }
-        if(callbackData === 'Показать прикрепленный файл') {
-            const orders = this.statusOrders[this.currentStatus] as Array<Order>
-            const url = orders[this.currentOrderPosition].assignmentUrl;
+        const orders = this.statusOrders[this.currentStatus] as Array<Order>;
+        const order = orders[this.currentOrderPosition];
+        if(callbackData === CALLBACK_CLIENT_FILE) {
+            const url = order.assignmentUrl;
             if(url) {
                 const document = await getBufferFromUrl(url);
                 await bot.sendDocument(stateContext.getChatId(), document, {}, {
-                    filename: 'Прикрепленный файл к заказу #' + orders[this.currentOrderPosition].orderId,
+                    filename: 'Прикрепленный файл к заказу #' + order.orderId,
                 });
                 await bot.answerCallbackQuery(callback.id);
             }
+        }
+        if(callbackData === CALLBACK_CLIENT_REJECT) {
+            await stateContext.setState(new OrderRejectState(stateContext, order));
         }
         return super.callbackController(callback);
     }

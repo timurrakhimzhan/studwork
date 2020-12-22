@@ -30,7 +30,7 @@ export default class ChooseWorkTypeState extends ReceiverBaseState {
         await bot.answerCallbackQuery(callback.id);
         if(!workTypeFound) {
             await stateContext.sendMessage('Извините, произошла ошибка во время выбора типа работы, пожалуйста, повторите попытку')
-            return this.initState();
+            return stateContext.initState();
         }
         const order = stateContext.getOrder();
         await bot.editMessageText(`Выбран тип задания: *${callbackData}*.`, {

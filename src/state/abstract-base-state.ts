@@ -23,11 +23,17 @@ abstract class AbstractBaseState {
         const stateContext = this.stateContext
         const lastMessageId = stateContext.getLastMessageId();
         if(lastMessageId) {
-            await stateContext.getBotContext().getBot().editMessageReplyMarkup({inline_keyboard: []}, {
-                chat_id: stateContext.getChatId(),
-                message_id: lastMessageId,
-            });
+            try {
+                await stateContext.getBotContext().getBot().editMessageReplyMarkup({inline_keyboard: []}, {
+                    chat_id: stateContext.getChatId(),
+                    message_id: lastMessageId,
+                });
+            } catch(e) {}
+
         }
+    }
+
+    public async onBackMessage(): Promise<any> {
     }
 
     public async initState(): Promise<any> {};

@@ -2,8 +2,7 @@ import Status, {statuses, statusMeaningMap, StatusName} from "../../database/mod
 import Order from "../../database/models/Order";
 import {CallbackQuery, InlineKeyboardButton, Message, SendMessageOptions} from "node-telegram-bot-api";
 import {generateKeyboardMenu} from "../../utils/message-utils";
-import {AbstractBaseState} from "../internal";
-import ReceiptGenerator from "../../utils/ReceiptGenerator";
+import {AbstractBaseState} from "./internal";
 
 export default abstract class AbstractOrdersState extends AbstractBaseState {
     protected statusOrders: {[T in StatusName]?: Array<Order>} = {}

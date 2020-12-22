@@ -2,6 +2,7 @@ export { default as AbstractStateContext } from '../abstract-state-context';
 export { default as AbstractBaseState } from '../abstract-base-state';
 
 export { default as AbstractOrdersState } from '../shared/abstract-orders-state';
+export { default as AbstractOrderRejectState } from './../shared/abstract-order-reject-state';
 
 export { default as ReceiverBaseState } from './receiver-base-state';
 export { default as ReceiverStateContext } from './receiver-state-context';
@@ -23,5 +24,6 @@ export { default as ChooseContactOptionState } from './choose-contact-option-sta
 export { default as PaymentState} from './payment-state';
 
 export { default as OrdersState } from './orders-state';
+export { default as OrderRejectState } from './order-reject-state';
 
 
