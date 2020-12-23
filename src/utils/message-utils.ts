@@ -5,6 +5,8 @@ import Order from "../database/models/Order";
 import moment from "moment";
 import {STATUS_FINISHED, STATUS_NOT_PAYED, STATUS_REJECTED_BY_CLIENT, STATUS_REJECTED_BY_TEACHER} from "../constants";
 import {statusMeaningMap} from "../database/models/Status";
+import Feedback from "../database/models/Feedback";
+import {feedbackTypeMeaningMap} from "../database/models/FeedbackType";
 
 export const generateSubjectsMessage = (subjects: Array<Subject>) => {
     return `Список доступных предметов:\n${subjects.map(subject => '• ' + subject.name).join('\n')}`;
@@ -89,4 +91,13 @@ export const generateReceipt = (order: Order) => {
         `Почта клиента: *${order.email}* \n` +
         `Как связаться: *${order.contactOption.name}* \n` +
         `Статус заказа: *${statusMeaningMap[order.status.name]}*` + extraInfo;
+}
+
+export const generateFeedbackInfo = (feedback: Feedback) => {
+    const userName = feedback.username ? '@' + feedback.username : '*Юзернейм не указан*';
+    return `*Отзыв #${feedback.feedbackId}* \n` +
+        `Никнейм: *${feedbackTypeMeaningMap[feedback.feedbackType.name]}* \n` +
+        `Юзернейм клиента: ${userName} \n` +
+        `Оценка: *${feedbackTypeMeaningMap[feedback.feedbackType.name]}* \n` +
+        `Комментарий: *${feedback.comment}*`;
 }

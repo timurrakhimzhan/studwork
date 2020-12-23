@@ -1,15 +1,36 @@
-import {AbstractInformatorBaseState} from "./internal";
 import {Sequelize} from "sequelize-typescript";
-import FeedbackType from "../../database/models/FeedbackType";
+import FeedbackType, {
+    feedbackTypeMeaningMap,
+    FeedbackTypeName,
+} from "../../database/models/FeedbackType";
 import Feedback from "../../database/models/Feedback";
+import {AbstractItemsState} from "../shared/internal";
+import InformatorStateContext from "./informator-state-context";
+import {InlineKeyboardButton} from "node-telegram-bot-api";
+import {generateFeedbackInfo} from "../../utils/message-utils";
 
-class FeedbacksState extends AbstractInformatorBaseState {
-    private async fetchFeedbackTypeCounts() {
+export default class FeedbacksState extends AbstractItemsState<FeedbackType, FeedbackTypeName, Feedback> {
+    stateContext: InformatorStateContext;
+    constructor(stateContext: InformatorStateContext) {
+        const feedbackTypes = stateContext.getBotContext().getFeedbackTypes().map((feedbackType) => feedbackType.name);
+        super(stateContext, feedbackTypes, feedbackTypeMeaningMap);
+        this.stateContext = stateContext;
+    }
+
+    async initState(): Promise<any> {
+        const feedbackTypeCounts = await this.fetchFeedbackTypeCounts();
+        feedbackTypeCounts.forEach((feedbackTypeCount) => {
+            this.categoryCountMap[feedbackTypeCount.get('name')] = parseInt(feedbackTypeCount.get('feedbacksCount') as string)
+        })
+        await this.stateContext.sendMessage('Выберите категорию отзыва:');
+    }
+
+     private async fetchFeedbackTypeCounts() {
         return FeedbackType.findAll({
-            attributes: ['statusId', 'name',
+            attributes: ['feedbackTypeId', 'name',
                 [Sequelize.fn('count', Sequelize.col('feedbacks.feedbackId')), 'feedbacksCount']
             ],
-            group: 'FeedbackType.statusId',
+            group: 'FeedbackType.feedbackTypeId',
             include: [{
                 model: Feedback, attributes: [], required: false,
                 where: {
@@ -18,9 +39,22 @@ class FeedbacksState extends AbstractInformatorBaseState {
             }],
         });
     }
-    private async fetchFeedbacks() {
 
+    protected generateItemMessage(feedback: Feedback): string {
+        return generateFeedbackInfo(feedback);
     }
-    async initState(): Promise<any> {
+
+    protected generateExtraInlineMarkup(feedback: Feedback): Array<Array<InlineKeyboardButton>> {
+        return []
+    }
+
+    async fetchItems() {
+        return Feedback.findAll({
+            include: [FeedbackType],
+            order: Sequelize.literal('"Feedback"."feedbackId" DESC'),
+            where: {
+                mock: !!process.env['MOCK'],
+            }
+        })
     }
 }

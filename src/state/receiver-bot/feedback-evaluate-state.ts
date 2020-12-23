@@ -13,7 +13,7 @@ class FeedbackEvaluateState extends FeedbackState {
         await stateContext.sendMessage('Пожалуйста, оставьте оценку.');
         await stateContext.sendMessage('Оцените работу бота:', {reply_markup: {
             inline_keyboard: generateInlineMenu(feedbackTypes.map((feedbackType) => ({name: feedbackTypeMeaningMap[feedbackType.name], callback: feedbackType.name}))),
-            remove_keyboard: true
+            resize_keyboard: true,
         }});
     }
 
@@ -27,6 +27,7 @@ class FeedbackEvaluateState extends FeedbackState {
         const feedbackTypeFound = feedbackTypes.find((feedbackType) => feedbackType.name === callbackData);
         if(feedbackTypeFound) {
             await bot.answerCallbackQuery(callback.id);
+            this.feedback.mock = !!process.env['MOCK'];
             this.feedback.feedbackType = feedbackTypeFound;
             this.feedback.username = message.chat.username || null;
             this.feedback.chatId = message.chat.id;

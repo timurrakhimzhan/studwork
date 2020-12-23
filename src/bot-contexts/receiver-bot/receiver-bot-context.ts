@@ -12,8 +12,6 @@ export default class ReceiverBotContext extends AbstractBotContext {
     private subjects: Array<Subject> = []
     private contactOptions: Array<ContactOption> = [];
     private contacts: Array<Contact> = [];
-    private feedbackTypes: Array<FeedbackType> = [];
-    private statuses: Array<Status> = []
     private hasGivenFeedback: {[key: number]: boolean | undefined} = {};
 
     init = async () => {
@@ -62,10 +60,6 @@ export default class ReceiverBotContext extends AbstractBotContext {
     getContactOptions = () => this.contactOptions;
 
     getContacts = () => this.contacts;
-
-    getStatuses = () => this.statuses;
-
-    getFeedbackTypes = () => this.feedbackTypes;
 
     setFeedbackGiven = (chatId: number, value: boolean = true): void => {
         this.hasGivenFeedback[chatId] = value;

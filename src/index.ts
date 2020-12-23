@@ -13,6 +13,8 @@ import WorkType from "./database/models/WorkType";
 import ContactOption from "./database/models/ContactOption";
 import {STATUS_PRICE_NOT_ASSIGNED, STATUS_REJECTED_BY_CLIENT} from "./constants";
 import Subject from "./database/models/Subject";
+import FeedbackType from "./database/models/FeedbackType";
+import Feedback from "./database/models/Feedback";
 dotenv.config();
 
 

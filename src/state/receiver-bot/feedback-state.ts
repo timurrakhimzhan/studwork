@@ -9,7 +9,7 @@ export default abstract class FeedbackState extends AbstractReceiverBaseState {
     protected feedback: Feedback;
 
     async sendMessage(message: string, options?: SendMessageOptions): Promise<Message> {
-        return super.sendMessage(message, {
+        return super.sendMessage(message, options || {
             reply_markup: {
                 keyboard: keyboardMarkup,
                 resize_keyboard: true

@@ -1,4 +1,10 @@
-import {AbstractOrdersState, OrderSetPriceState, InformatorStateContext, OrderRejectState} from "./internal";
+import {
+    AbstractOrdersState,
+    OrderSetPriceState,
+    InformatorStateContext,
+    OrderRejectState,
+    WelcomeState
+} from "./internal";
 import Status from "../../database/models/Status";
 import {Sequelize} from "sequelize-typescript";
 import Order from "../../database/models/Order";
@@ -6,7 +12,7 @@ import Teacher from "../../database/models/Teacher";
 import Subject from "../../database/models/Subject";
 import WorkType from "../../database/models/WorkType";
 import ContactOption from "../../database/models/ContactOption";
-import {CallbackQuery, InlineKeyboardButton} from "node-telegram-bot-api";
+import {CallbackQuery, InlineKeyboardButton, Message} from "node-telegram-bot-api";
 import {
     CALLBACK_SET_PRICE,
     CALLBACK_TEACHER_REJECT,
@@ -106,6 +112,15 @@ export default class OrdersState extends AbstractOrdersState {
             extraInlineMarkup.push([{text: 'Загрузить выполненное задание', callback_data: CALLBACK_UPLOAD_SOLUTION}])
         }
         return extraInlineMarkup;
+    }
+
+    async messageController(message: Message): Promise<any> {
+        const stateContext = this.stateContext;
+        const isSessionActive = await stateContext.getIsSessionActive()
+        if(!isSessionActive) {
+            return stateContext.setState(new WelcomeState(stateContext));
+        }
+        return super.messageController(message);
     }
 
     async callbackController(callback: CallbackQuery): Promise<any> {

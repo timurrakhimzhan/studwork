@@ -14,6 +14,7 @@ export { default as WelcomeState } from './welcome-state';
 export { default as LoginInputState } from './login-input-state';
 export { default as PasswordInputState } from './password-input-state';
 export { default as MainMenuState } from './main-menu-state';
+export { default as FeedbacksState } from './feedbacks-state';
 
 export { default as OrdersState } from './orders-state';
 export { default as OrderRejectState } from './orders-reject-state';
@@ -21,3 +22,4 @@ export { default as OrderSetPriceState } from './order-set-price-state';
 export { default as OrderPriceCommentState } from './order-price-comment-state';
 export { default as OrderUploadSolutionState } from './order-upload-solution-state';
 export { default as OrderSolutionCommentState } from './order-solution-comment-state';
+

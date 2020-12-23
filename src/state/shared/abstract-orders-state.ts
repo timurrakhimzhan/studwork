@@ -1,5 +1,5 @@
 import {AbstractItemsState} from "./internal";
-import Status, {statuses, statusMeaningMap, StatusName} from "../../database/models/Status";
+import Status, {statusMeaningMap, StatusName} from "../../database/models/Status";
 import Order from "../../database/models/Order";
 import {CallbackQuery, InlineKeyboardButton} from "node-telegram-bot-api";
 import {CALLBACK_CLIENT_FILE, CALLBACK_TEACHER_FILE, STATUS_FINISHED} from "../../constants";
@@ -16,6 +16,7 @@ export default abstract class AbstractOrdersState extends AbstractItemsState<Sta
     }
 
     protected constructor(stateContext: AbstractStateContext) {
+        const statuses = stateContext.getBotContext().getStatuses().map((status) => status.name);
         super(stateContext, statuses, statusMeaningMap);
     }
 

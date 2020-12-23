@@ -24,6 +24,16 @@ export default class InformatorStateContext extends AbstractStateContext {
 
     getIsLoggedIn = () => this.isLoggedIn;
 
+    async getIsSessionActive(): Promise<boolean> {
+        await this.teacher.reload();
+        const chatId: number | null = this.teacher.chatId;
+        if(chatId === this.getChatId()) {
+            return true;
+        }
+        this.isLoggedIn = false;
+        return false;
+    }
+
     async login() {
         const teacher = await Teacher.findOne({ where: {
             login: this.teacher.login,
