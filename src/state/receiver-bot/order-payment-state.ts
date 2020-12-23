@@ -1,5 +1,5 @@
 import Order from "../../database/models/Order";
-import {LabeledPrice, Message} from "node-telegram-bot-api";
+import {LabeledPrice, Message, SendMessageOptions} from "node-telegram-bot-api";
 import {OrdersState, ReceiverStateContext, AbstractOrderState} from "./internal";
 import Status from "../../database/models/Status";
 import {STATUS_PAYED} from "../../constants";
@@ -11,6 +11,11 @@ export default class OrderPaymentState extends AbstractOrderState {
         super(stateContext, order);
         this.stateContext = stateContext;
         this.invoiceMessageIdToDelete = null;
+    }
+
+    async sendMessage(message: string, options?: SendMessageOptions): Promise<Message> {
+        await this.deleteInvoice();
+        return super.sendMessage(message, options);
     }
 
     async initState(): Promise<any> {
@@ -29,7 +34,7 @@ export default class OrderPaymentState extends AbstractOrderState {
         const price: LabeledPrice = {label: priceNum + ' тг ', amount: priceNum * 100};
         try {
             const invoiceMessage = await stateContext.getBotContext().getBot().sendInvoice(stateContext.getChatId(), title, description, payload, paymentToken, startParam, currency, [price]);
-            await super.onNewMessage();
+            await this.onNewMessage();
             this.invoiceMessageIdToDelete = invoiceMessage.message_id;
         } catch (e) {
             await stateContext.sendMessage('Прозошла непредвиденная ошибка. Свяжитесь с службой поддержки.');
@@ -41,7 +46,7 @@ export default class OrderPaymentState extends AbstractOrderState {
     async messageController(message: Message): Promise<any> {
         const stateContext = this.stateContext;
         if(!message.successful_payment) {
-            await stateContext.sendMessage('Произошла ошибка во время оплаты.');
+            await stateContext.sendMessage('Произошла ошибка во время оплаты. Пожалуйста, повторите позже');
             return stateContext.setState(new OrdersState(stateContext));
         }
         const status = await Status.findOne({ where: {name: STATUS_PAYED }});
@@ -56,14 +61,12 @@ export default class OrderPaymentState extends AbstractOrderState {
         await stateContext.setState(new OrdersState(stateContext));
     }
 
-    async onNewMessage(): Promise<any> {
-        await super.onNewMessage();
+    async deleteInvoice(): Promise<any> {
         if(!this.invoiceMessageIdToDelete) {
             return;
         }
         try {
-            const stateContext = this.stateContext;
-            await stateContext.getBotContext().getBot().deleteMessage(stateContext.getChatId(), this.invoiceMessageIdToDelete.toString());
+            await this.stateContext.getBotContext().getBot().deleteMessage(this.stateContext.getChatId(), this.invoiceMessageIdToDelete.toString());
         } catch (e) {}
     }
 

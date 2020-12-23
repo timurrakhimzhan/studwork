@@ -50,7 +50,6 @@ export default class OrdersState extends AbstractOrdersState {
                 [Sequelize.fn('count', Sequelize.col('orders.orderId')), 'ordersCount']
             ],
             group: 'Status.statusId',
-            order: Sequelize.literal('"Order"."orderId" DESC'),
             include: [{
                 model: Order, attributes: [], required: false,
                 where: {

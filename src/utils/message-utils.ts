@@ -74,7 +74,7 @@ export const generateReceipt = (order: Order) => {
             `Комментарий к цене: *${order.priceComment}* \n` +
             `Комментарий к выполненному заданию: *${order.solutionComment}*`
     }
-    return `Заказ #: *${order.orderId}* \n` +
+    return `*Заказ #${order.orderId}* \n` +
         `Имя клиента: *${order.clientName}* \n` +
         `Юзернейм клиента: ${userName} \n` +
         `Предмет: *${order.subject.name}* \n` +

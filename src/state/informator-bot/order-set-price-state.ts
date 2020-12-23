@@ -1,6 +1,5 @@
 import {OrdersState, OrderPriceCommentState, InformatorOrderState} from "./internal";
-import Order from "../../database/models/Order";
-import {KeyboardButton, Message, SendMessageOptions} from "node-telegram-bot-api";
+import {Message} from "node-telegram-bot-api";
 
 
 export default class OrderSetPriceState extends InformatorOrderState {
