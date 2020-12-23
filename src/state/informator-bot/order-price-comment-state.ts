@@ -50,7 +50,6 @@ export default class OrderPriceCommentState extends AbstractInformatorOrderState
         await this.order.save();
         await this.order.$set('status', statusFound);
         await stateContext.sendMessage('Цена успешно установлена!');
-        console.log(this.order.toJSON());
         this.order.status = statusFound;
         await stateContext.notifyReceiverBot(this.order);
         await stateContext.setState(new OrdersState(stateContext));
