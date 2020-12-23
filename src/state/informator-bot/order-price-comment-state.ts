@@ -44,13 +44,15 @@ export default class OrderPriceCommentState extends AbstractInformatorOrderState
         const statuses = stateContext.getBotContext().getStatuses();
         const statusFound = statuses.find((status) => status.name === STATUS_NOT_PAYED);
         if(!statusFound) {
-            const stateContext = this.stateContext;
             await stateContext.sendMessage('Ошибка сервера, пожалуйста, повторите позже');
             return stateContext.setState(new OrdersState(stateContext));
         }
         await this.order.save();
         await this.order.$set('status', statusFound);
         await stateContext.sendMessage('Цена успешно установлена!');
-        return stateContext.setState(new OrdersState(stateContext));
+        console.log(this.order.toJSON());
+        this.order.status = statusFound;
+        await stateContext.notifyReceiverBot(this.order);
+        await stateContext.setState(new OrdersState(stateContext));
     }
 }

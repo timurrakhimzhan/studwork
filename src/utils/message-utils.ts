@@ -3,10 +3,17 @@ import Subject from "../database/models/Subject";
 import axios from "axios";
 import Order from "../database/models/Order";
 import moment from "moment";
-import {STATUS_FINISHED, STATUS_NOT_PAYED, STATUS_REJECTED_BY_CLIENT, STATUS_REJECTED_BY_TEACHER} from "../constants";
+import {
+    STATUS_FINISHED,
+    STATUS_NOT_PAYED,
+    STATUS_PRICE_NOT_ASSIGNED,
+    STATUS_REJECTED_BY_CLIENT,
+    STATUS_REJECTED_BY_TEACHER
+} from "../constants";
 import {statusMeaningMap} from "../database/models/Status";
 import Feedback from "../database/models/Feedback";
 import {feedbackTypeMeaningMap} from "../database/models/FeedbackType";
+import {or} from "sequelize";
 
 export const generateSubjectsMessage = (subjects: Array<Subject>) => {
     return `Список доступных предметов:\n${subjects.map(subject => '• ' + subject.name).join('\n')}`;
@@ -100,4 +107,38 @@ export const generateFeedbackInfo = (feedback: Feedback) => {
         `Юзернейм клиента: ${userName} \n` +
         `Оценка: *${feedbackTypeMeaningMap[feedback.feedbackType.name]}* \n` +
         `Комментарий: *${feedback.comment}*`;
+}
+
+export const generateTeacherNotification = (order: Order) => {
+    const lastLine = `Для более подробной информации, выберите статус заказа: *${statusMeaningMap[order.status.name]}*`;
+    if(order.status.name === STATUS_PRICE_NOT_ASSIGNED) {
+        const formatter =  Intl.DateTimeFormat(['ru-RU'], {day: 'numeric', month: 'long', year: 'numeric'});
+        return `*Новый заказ!* \n` +
+            `*Заказ #${order.orderId}* \n` +
+            `Дата выполнения: *${formatter.format(order.datetime)}* \n` +
+            `Время выполнения: *${moment(order.datetime).format('HH:mm')}* \n` + lastLine
+    }
+    return `*Обновился статус заказа #${order.orderId}* \n` + lastLine;
+}
+
+export const generateClientNotification = (order: Order) => {
+    const lastLine = `Для более подробной информации, выберите статус заказа: *${statusMeaningMap[order.status.name]}*`;
+    if(order.status.name === STATUS_REJECTED_BY_TEACHER) {
+        return `*Учитель отменил ваш заказ!* \n` +
+            `*Заказ #${order.orderId}* \n` +
+            `Причина отмены: *${order.rejectionTeacherReason}* \n` + lastLine;
+    }
+    if(order.status.name === STATUS_NOT_PAYED) {
+        return `*Учитель установил цену вашего заказа!* \n` +
+            `*Заказ #${order.orderId}* \n` +
+            `Цена: *${order.price}тг* \n` + lastLine;
+    }
+    if(order.status.name === STATUS_FINISHED) {
+        return `*Учитель выполнил ваш заказ!* \n` +
+            `*Заказ #${order.orderId}* \n` +
+            `Цена: *${order.price}* \n`
+            + lastLine + `\n` +
+            `*Спасибо за пользование услугами нашего сервиса!*`;
+    }
+    return `*Обновился статус заказа #${order.orderId}* \n` + lastLine;
 }

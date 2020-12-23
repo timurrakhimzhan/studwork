@@ -1,10 +1,14 @@
 import {AbstractReceiverOrderState, EmailInputState} from "./internal";
 import {CallbackQuery, Message} from "node-telegram-bot-api";
-import {generateInlineMenu, generateReceipt} from "../../utils/message-utils";
+import {generateInlineMenu, generateReceipt, generateTeacherNotification} from "../../utils/message-utils";
 import MainMenuState from "./main-menu-state";
 import Status from "../../database/models/Status";
 import Teacher from "../../database/models/Teacher";
 import Subject from "../../database/models/Subject";
+import Order from "../../database/models/Order";
+import {Sequelize} from "sequelize-typescript";
+import {Op} from "sequelize";
+import {STATUS_PRICE_NOT_ASSIGNED} from "../../constants";
 
 class ChooseContactOptionState extends AbstractReceiverOrderState {
     async initState () {
@@ -25,20 +29,55 @@ class ChooseContactOptionState extends AbstractReceiverOrderState {
         const stateContext = this.stateContext;
         const botContext = stateContext.getBotContext();
         const contactOptionFound = botContext.getContactOptions().find((contactOption) => contactOption.callback === callbackData);
-        const statusPriceNotAssigned = await Status.findOne({where: {
-            name: 'STATUS_PRICE_NOT_ASSIGNED'
-        }});
+        const statusPriceNotAssigned = botContext.getStatuses().find(status => status.name === STATUS_PRICE_NOT_ASSIGNED);
+        await botContext.getBot().editMessageText(`Выбран вариант: *${callbackData}*.`, {
+            chat_id: stateContext.getChatId(),
+            message_id: message.message_id,
+            parse_mode: 'Markdown',
+            reply_markup: {inline_keyboard: []}
+        });
         const order = this.order;
         const teacher = await Teacher.findOne({
+            attributes: ['teacherId', 'chatId',
+                [Sequelize.fn('count', Sequelize.col('orders.orderId')), 'ordersCount']
+            ],
+            group: ['Teacher.teacherId'],
+            order: Sequelize.literal('"ordersCount" ASC'),
+            where: {
+                mock: !!process.env['MOCK'],
+                isAdmin: false,
+            },
             include: [
                 {
                     model: Subject,
                     where: {
-                        name: order.subject.name,
-                    }
+                        name: 'Математика',
+                        mock: !!process.env['MOCK'],
+                    },
+                    duplicating: false,
+                    through: {
+                        attributes: []
+                    },
+                    attributes: []
+                },
+                {
+                    model: Order,
+                    required: false,
+                    duplicating: false,
+                    where: {
+                        mock: !!process.env['MOCK'],
+                    },
+                    attributes: []
                 }
-            ]
+            ],
         });
+
+        if(!teacher) {
+            await stateContext.sendMessage('Извините, в данный момент нет свободного учителя по данному предмету. Попробуйте оформить заказ позже')
+            await stateContext.setState(new MainMenuState(stateContext));
+            return;
+        }
+
         if(!statusPriceNotAssigned || !teacher || !contactOptionFound) {
             await stateContext.sendMessage('Извините, произошла ошибка обработки заказа, пожалуйста, попробуйте оформить заказ через час.')
             await stateContext.setState(new MainMenuState(stateContext));
@@ -62,15 +101,10 @@ class ChooseContactOptionState extends AbstractReceiverOrderState {
             return stateContext.setState(new MainMenuState(stateContext));
         }
         order.workType = workType;
-        await botContext.getBot().editMessageText(`Выбран вариант: *${callbackData}*.`, {
-            chat_id: stateContext.getChatId(),
-            message_id: message.message_id,
-            parse_mode: 'Markdown',
-            reply_markup: {inline_keyboard: []}
-        });
         await stateContext.sendMessage(generateReceipt(order));
         await stateContext.sendMessage('Спасибо за пользование услугами нашего сервиса! ' +
             'Учитель оценит стоймость выполнения вышего задания, после чего *Вам придет уведомление об оплате*, спасибо!')
+        await stateContext.notifyInformatorBot(order);
         await stateContext.setState(new MainMenuState(stateContext));
     }
 }

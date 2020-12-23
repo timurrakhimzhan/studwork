@@ -7,12 +7,20 @@ import Contact from "../../database/models/Contact";
 import WorkType from "../../database/models/WorkType";
 import FeedbackType from "../../database/models/FeedbackType";
 import Status from "../../database/models/Status";
+import App from "../../App";
+import TelegramBot from "node-telegram-bot-api";
 
 export default class ReceiverBotContext extends AbstractBotContext {
     private subjects: Array<Subject> = []
     private contactOptions: Array<ContactOption> = [];
     private contacts: Array<Contact> = [];
     private hasGivenFeedback: {[key: number]: boolean | undefined} = {};
+    private app: App;
+
+    constructor(bot: TelegramBot, app: App) {
+        super(bot);
+        this.app = app;
+    }
 
     init = async () => {
         await Promise.all([
@@ -22,6 +30,10 @@ export default class ReceiverBotContext extends AbstractBotContext {
             this.fetchStatuses(),
             this.fetchFeedbackTypes(),
         ]);
+    }
+
+    async notifyInformatorBot(chatIds: Array<number>, message: string): Promise<any> {
+        return this.app.notifyInformatorBot(chatIds, message)
     }
 
     getChatStateContext(chatId: number): ReceiverStateContext {

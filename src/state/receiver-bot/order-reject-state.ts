@@ -3,6 +3,9 @@ import Order from "../../database/models/Order";
 import ReceiverStateContext from "./receiver-state-context";
 import Status from "../../database/models/Status";
 import {STATUS_PAYED, STATUS_REJECTED_BY_CLIENT} from "../../constants";
+import Teacher from "../../database/models/Teacher";
+import {Op} from "sequelize";
+import {generateTeacherNotification} from "../../utils/message-utils";
 
 export default class OrderRejectState extends AbstractOrderRejectState {
 
@@ -28,9 +31,12 @@ export default class OrderRejectState extends AbstractOrderRejectState {
         }
         await this.order.save();
         await this.order.$set('status', statusFound);
+        this.order.status = statusFound;
     }
 
     protected async onSuccess(): Promise<any> {
-        return this.stateContext.setState(new OrdersState(this.stateContext));
+        const stateContext = this.stateContext
+        await stateContext.notifyInformatorBot(this.order);
+        return stateContext.setState(new OrdersState(stateContext));
     }
 }

@@ -25,9 +25,12 @@ export default class OrdersRejectState extends AbstractOrderRejectState {
         }
         await this.order.save();
         await this.order.$set('status', statusFound);
+        this.order.status = statusFound;
     }
 
     protected async onSuccess(): Promise<any> {
-        return this.stateContext.setState(new OrdersState(this.stateContext));
+        const stateContext = this.stateContext;
+        await stateContext.notifyReceiverBot(this.order);
+        return stateContext.setState(new OrdersState(stateContext));
     }
 }

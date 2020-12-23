@@ -1,8 +1,10 @@
-import {AbstractStateContext, WelcomeState, LoginInputState, MainMenuState} from "./internal";
+import {AbstractStateContext, WelcomeState, LoginInputState, MainMenuState, OrdersState} from "./internal";
 import InformatorBotContext from "../../bot-contexts/informator-bot";
 import Teacher from "../../database/models/Teacher";
 import AuthenticationError from "../../errors/authentication-error";
 import {Message} from "node-telegram-bot-api";
+import Order from "../../database/models/Order";
+import {generateClientNotification} from "../../utils/message-utils";
 
 export default class InformatorStateContext extends AbstractStateContext {
     protected readonly botContext: InformatorBotContext;
@@ -17,6 +19,10 @@ export default class InformatorStateContext extends AbstractStateContext {
     }
 
     getTeacher = () => this.teacher;
+
+    setTeacher = (teacher: Teacher) => {
+        this.teacher = teacher;
+    }
 
     resetTeacher = () => {
         this.teacher = new Teacher();
@@ -50,6 +56,7 @@ export default class InformatorStateContext extends AbstractStateContext {
         await teacher.save();
         this.teacher = teacher;
         this.isLoggedIn = true;
+        this.state = new OrdersState(this);
     }
 
     async logout() {
@@ -61,6 +68,18 @@ export default class InformatorStateContext extends AbstractStateContext {
 
     getBotContext(): InformatorBotContext {
         return this.botContext;
+    }
+
+    async notifyAboutOrder(message: string) {
+        if(this.getIsLoggedIn()) {
+            await this.sendMessage(message, {parse_mode: 'Markdown'});
+            await this.setState(new OrdersState(this));
+        }
+    }
+
+    async notifyReceiverBot(order: Order) {
+        const chatId = order.chatId as number;
+        await this.getBotContext().notifyReceiverBot([chatId], generateClientNotification(order));
     }
 
     async messageController(message: Message): Promise<any> {

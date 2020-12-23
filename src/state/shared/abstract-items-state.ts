@@ -105,12 +105,11 @@ export default abstract class AbstractItemsState<T, K extends string, R> extends
     async messageController(message: Message): Promise<any> {
         const categoryChosen =
             this.categories.find((category) => message.text?.includes(this.categoryMeaningMap[category]));
-        if(!categoryChosen) {
-            await this.stateContext.sendMessage('Некорректный ввод, пожалуйста, повторите еще раз');
-            return;
+        if(categoryChosen) {
+            this.currentCategory = categoryChosen;
+            return this.showItem();
         }
-        this.currentCategory = categoryChosen;
-        await this.showItem();
+        await this.initState();
     }
 
     async callbackController(callback: CallbackQuery): Promise<any> {

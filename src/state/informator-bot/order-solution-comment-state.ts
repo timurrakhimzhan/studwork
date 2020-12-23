@@ -43,14 +43,15 @@ export default class OrderSolutionCommentState extends AbstractInformatorOrderSt
         const statuses = stateContext.getBotContext().getStatuses();
         const statusFound = statuses.find((status) => status.name === STATUS_FINISHED);
         if(!statusFound) {
-            const stateContext = this.stateContext;
             await stateContext.sendMessage('Ошибка сервера, пожалуйста, повторите позже');
             return stateContext.setState(new OrdersState(stateContext));
         }
         await this.order.save();
         await this.order.$set('status', statusFound);
         await stateContext.sendMessage('Выполненное задание успешно загружено!');
-        return stateContext.setState(new OrdersState(stateContext));
+        this.order.status = statusFound;
+        await stateContext.notifyReceiverBot(this.order);
+        await stateContext.setState(new OrdersState(stateContext));
     }
 
 

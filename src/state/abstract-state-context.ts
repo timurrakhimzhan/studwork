@@ -26,6 +26,8 @@ abstract class AbstractStateContext {
 
     public getLastMessageId = () => this.lastMessageId;
 
+    public abstract notifyAboutOrder(message: string): Promise<any>;
+
     public sendMessage = async (message: string, options?: SendMessageOptions) => {
         await this.state.onNewMessage();
         const {message_id} = await this.state.sendMessage(message, options);

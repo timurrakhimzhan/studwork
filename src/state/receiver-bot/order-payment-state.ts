@@ -3,6 +3,9 @@ import {LabeledPrice, Message, SendMessageOptions} from "node-telegram-bot-api";
 import {OrdersState, ReceiverStateContext, AbstractOrderState} from "./internal";
 import Status from "../../database/models/Status";
 import {STATUS_PAYED} from "../../constants";
+import Teacher from "../../database/models/Teacher";
+import {Op} from "sequelize";
+import {generateTeacherNotification} from "../../utils/message-utils";
 
 export default class OrderPaymentState extends AbstractOrderState {
     stateContext: ReceiverStateContext;
@@ -59,6 +62,8 @@ export default class OrderPaymentState extends AbstractOrderState {
         await this.order.$set('status', statusFound);
         this.invoiceMessageIdToDelete = null;
         await stateContext.sendMessage('Оплата прошла успешно, мы с Вами свяжемся.');
+        this.order.status = statusFound;
+        await stateContext.notifyInformatorBot(this.order);
         await stateContext.setState(new OrdersState(stateContext));
     }
 
