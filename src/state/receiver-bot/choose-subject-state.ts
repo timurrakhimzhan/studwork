@@ -1,8 +1,8 @@
-import {MainMenuState, NameInputState, ChooseWorkTypeState, ReceiverOrderState} from "./internal";
+import {MainMenuState, NameInputState, ChooseWorkTypeState, AbstractReceiverOrderState} from "./internal";
 import {generateInlineMenu} from "../../utils/message-utils";
 import {CallbackQuery, Message, SendMessageOptions} from "node-telegram-bot-api";
 
-class ChooseSubjectState extends ReceiverOrderState {
+class ChooseSubjectState extends AbstractReceiverOrderState {
     async initState () {
         const stateContext = this.stateContext;
         const subjects = stateContext.getBotContext().getSubjects();

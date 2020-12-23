@@ -1,8 +1,8 @@
-import {ReceiverOrderState, TimeInputState, CommentInputState} from "./internal";
+import {AbstractReceiverOrderState, TimeInputState, CommentInputState} from "./internal";
 import {CallbackQuery, Message, SendMessageOptions} from "node-telegram-bot-api";
 import CalendarInfo from "../../calendar";
 
-class DateInputState extends ReceiverOrderState {
+class DateInputState extends AbstractReceiverOrderState {
     private onDayChosen = async (year: number, month: number, day: number) => {
         const stateContext = this.stateContext;
         const date = new Date();

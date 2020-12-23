@@ -1,7 +1,7 @@
-import {ReceiverBaseState, ChooseSubjectState, ReceiverOrderState, MainMenuState} from "./internal";
+import {AbstractReceiverBaseState, ChooseSubjectState, AbstractReceiverOrderState, MainMenuState} from "./internal";
 import {CallbackQuery, Message, PreCheckoutQuery} from "node-telegram-bot-api";
 
-class NameInputState extends ReceiverOrderState {
+class NameInputState extends AbstractReceiverOrderState {
     async initState() {
         await this.stateContext.sendMessage('Как вас зовут?');
     }
@@ -17,7 +17,7 @@ class NameInputState extends ReceiverOrderState {
         }
         const stateContext = this.stateContext;
         this.order.clientName = message.text;
-        this.order.username = message.chat.username || 'Юзернейм не указан';
+        this.order.username = message.chat.username || null;
         this.order.chatId = message.chat.id;
         await stateContext.setState(new ChooseSubjectState(stateContext, this.order));
     }

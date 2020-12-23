@@ -1,17 +1,20 @@
-import {ReceiverBaseState, MainMenuState, FeedbackCommentState} from "./internal";
-import {CallbackQuery, Message, PreCheckoutQuery, ReplyKeyboardMarkup} from "node-telegram-bot-api";
-
-const feedbackEvaluateInlineMenu = [[
-        {text: 'Отлично', callback_data: 'Отлично'},
-        {text: 'Плохо', callback_data: 'Плохо'}],
-        [{text: 'Удовлетворительно', callback_data: 'Удовлетворительно'}]];
+import {FeedbackCommentState} from "./internal";
+import {CallbackQuery, Message} from "node-telegram-bot-api";
+import FeedbackState from "./feedback-state";
+import {generateInlineMenu} from "../../utils/message-utils";
+import {feedbackTypeMeaningMap} from "../../database/models/FeedbackType";
 
 
-class FeedbackEvaluateState extends ReceiverBaseState {
+class FeedbackEvaluateState extends FeedbackState {
     async initState() {
         const stateContext = this.stateContext;
+        const feedbackTypes = stateContext.getBotContext().getFeedbackTypes();
+
         await stateContext.sendMessage('Пожалуйста, оставьте оценку.');
-        await stateContext.sendMessage('Оцените работу бота:', {reply_markup: {inline_keyboard: feedbackEvaluateInlineMenu, remove_keyboard: true}});
+        await stateContext.sendMessage('Оцените работу бота:', {reply_markup: {
+            inline_keyboard: generateInlineMenu(feedbackTypes.map((feedbackType) => ({name: feedbackTypeMeaningMap[feedbackType.name], callback: feedbackType.name}))),
+            remove_keyboard: true
+        }});
     }
 
     async callbackController (callback: CallbackQuery) {
@@ -20,18 +23,20 @@ class FeedbackEvaluateState extends ReceiverBaseState {
         const stateContext = this.stateContext;
         const botContext = stateContext.getBotContext();
         const bot = botContext.getBot();
-        if(callbackData === 'Отлично' || callbackData === 'Плохо' || callbackData === 'Удовлетворительно') {
+        const feedbackTypes = stateContext.getBotContext().getFeedbackTypes();
+        const feedbackTypeFound = feedbackTypes.find((feedbackType) => feedbackType.name === callbackData);
+        if(feedbackTypeFound) {
             await bot.answerCallbackQuery(callback.id);
-            const feedback = botContext.getFeedBack(stateContext.getChatId());
-            feedback.setEvaluation(callbackData);
-            feedback.setUsername(message.chat.username || 'Юзернейм не указан');
-            await bot.editMessageText(`Вы выбрали: *${callbackData}*`, {
+            this.feedback.feedbackType = feedbackTypeFound;
+            this.feedback.username = message.chat.username || null;
+            this.feedback.chatId = message.chat.id;
+            await bot.editMessageText(`Вы выбрали: *${feedbackTypeMeaningMap[feedbackTypeFound.name]}*`, {
                 chat_id: stateContext.getChatId(),
                 message_id: message.message_id,
                 parse_mode: 'Markdown',
                 reply_markup: {inline_keyboard: []}
             });
-            await stateContext.setState(new FeedbackCommentState(stateContext));
+            await stateContext.setState(new FeedbackCommentState(stateContext, this.feedback));
         }
     }
 

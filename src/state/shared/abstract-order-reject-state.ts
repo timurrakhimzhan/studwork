@@ -18,7 +18,7 @@ export default abstract class OrderRejectState extends AbstractOrderState {
 
     public abstract onBackMessage(): Promise<any>;
 
-    protected abstract updateDatabase(rejectionComment: string): Promise<any>;
+    protected abstract updateDatabase(rejectionReason: string): Promise<any>;
 
     protected abstract onSuccess(): Promise<any>;
 

@@ -1,4 +1,4 @@
-import {NameInputState, FeedbackEvaluateState, ReceiverBaseState} from "./internal";
+import {NameInputState, FeedbackEvaluateState, AbstractReceiverBaseState} from "./internal";
 import {
     CallbackQuery,
     KeyboardButton,
@@ -8,6 +8,7 @@ import {
 import {generateInlineMenu, generatePriceList, generateSubjectsMessage} from "../../utils/message-utils";
 import {OrdersState} from "./internal";
 import Order from "../../database/models/Order";
+import Feedback from "../../database/models/Feedback";
 
 const mainMenu: Array<Array<KeyboardButton>> =  [
     [{text: 'Предметы'}, {text: 'Прайс-лист'}],
@@ -15,7 +16,7 @@ const mainMenu: Array<Array<KeyboardButton>> =  [
     [{text: 'Контакты'}, {text: 'Оценить работу бота'}]
 ];
 
-class MainMenuState extends ReceiverBaseState {
+class MainMenuState extends AbstractReceiverBaseState {
      async sendMessage (message: string, options: SendMessageOptions): Promise<Message> {
         return super.sendMessage(message, options || {reply_markup: {keyboard: mainMenu, resize_keyboard: true}})
     }
@@ -43,7 +44,7 @@ class MainMenuState extends ReceiverBaseState {
             if(botContext.hasFeedbackGiven(message.chat.id)) {
                 return stateContext.sendMessage('Вы уже оценили работу бота. Можете присоединиться к нам в общий чат: @StudWorkChat');
             } else {
-                return stateContext.setState(new FeedbackEvaluateState(stateContext))
+                return stateContext.setState(new FeedbackEvaluateState(stateContext, new Feedback()))
             }
         }
         if(message.text?.trim() === 'Заказать работу') {

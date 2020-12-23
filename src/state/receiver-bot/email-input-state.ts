@@ -1,6 +1,6 @@
 import {
     ChooseContactOptionState,
-    ReceiverOrderState,
+    AbstractReceiverOrderState,
     PhoneInputState
 } from "./internal";
 import {Message} from "node-telegram-bot-api";
@@ -8,7 +8,7 @@ import {Message} from "node-telegram-bot-api";
 
 const regex = /\S+@\S+\.\S+/;
 
-class EmailInputState extends ReceiverOrderState {
+class EmailInputState extends AbstractReceiverOrderState {
 
     async initState() {
         await this.stateContext.sendMessage('Введите Ваш адрес электронной почты:');

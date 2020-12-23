@@ -1,7 +1,8 @@
-import {ReceiverBaseState, MainMenuState} from "./internal";
-import {CallbackQuery, Message, PreCheckoutQuery} from "node-telegram-bot-api";
+import {MainMenuState} from "./internal";
+import {Message} from "node-telegram-bot-api";
+import FeedbackState from "./feedback-state";
 
-class FeedbackCommentState extends ReceiverBaseState {
+class FeedbackCommentState extends FeedbackState {
 
     async initState() {
         await this.stateContext.sendMessage('Оставьте свой комментарий:');
@@ -9,13 +10,15 @@ class FeedbackCommentState extends ReceiverBaseState {
 
     async messageController (message: Message) {
         const stateContext = this.stateContext;
+        if(!message.text?.trim().length) {
+            return stateContext.sendMessage('Комментарий должен содержать символы.')
+        }
         const botContext = stateContext.getBotContext();
-        const feedBack = botContext.getFeedBack(message.chat.id);
-        feedBack.setComment(message.text || '')
+        this.feedback.comment = message.text;
         botContext.setFeedbackGiven(stateContext.getChatId(), true);
+        await this.feedback.save();
+        await this.feedback.$set('feedbackType', this.feedback.feedbackType);
         await stateContext.sendMessage('Спасибо! Можете присоединиться к нам в общий чат: @StudWorkChat');
-        // await addFeedback(botContext.getDoc(), stateContext.getChatId(), feedBack)
-
         await stateContext.setState(new MainMenuState(stateContext));
     }
 }

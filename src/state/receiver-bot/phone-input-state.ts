@@ -1,7 +1,7 @@
-import {ReceiverBaseState, EmailInputState, ReceiverOrderState, TimeInputState} from "./internal";
+import {AbstractReceiverBaseState, EmailInputState, AbstractReceiverOrderState, TimeInputState} from "./internal";
 import {Message} from "node-telegram-bot-api";
 
-class PhoneInputState extends ReceiverOrderState {
+class PhoneInputState extends AbstractReceiverOrderState {
     async initState() {
         await this.stateContext.sendMessage('Введите Ваш номер телефона, например +77071231212 или 87071231212:');
     }

@@ -1,6 +1,6 @@
 import {AbstractBaseState, InformatorStateContext} from "./internal";
 
-export default class InformatorBaseState extends AbstractBaseState {
+export default abstract class AbstractInformatorBaseState extends AbstractBaseState {
     stateContext: InformatorStateContext;
     constructor(context: InformatorStateContext) {
         super(context);

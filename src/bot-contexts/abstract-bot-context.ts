@@ -11,5 +11,7 @@ export default abstract class AbstractBotContext {
 
     public getBot = () => this.bot as TelegramBot;
 
+    abstract init(): Promise<any>;
+
     public abstract getChatStateContext(chatId: number): AbstractStateContext;
 }

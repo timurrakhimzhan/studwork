@@ -12,6 +12,10 @@ class App {
         const informatorBot = connectInformatorBot();
         this.receiverBotContext = new ReceiverBotContext(receiverBot);
         this.informatorBotContext = new InformatorBotContext(informatorBot);
+        await Promise.all([
+            this.receiverBotContext.init(),
+            this.informatorBotContext.init()
+        ]);
     }
 
     getReceiverBotContext = (): ReceiverBotContext => this.receiverBotContext as ReceiverBotContext;

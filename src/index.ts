@@ -32,7 +32,6 @@ const app = async () => {
     console.log('Database is filled');
     const app = new App();
     await app.init();
-    await app.getReceiverBotContext().init();
     console.log('Initialization is finished');
 
     await initSubjectsPolling(app.getReceiverBotContext());

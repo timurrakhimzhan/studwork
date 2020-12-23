@@ -1,12 +1,12 @@
-import {InformatorOrderState, OrdersState, OrderUploadSolutionState} from "./internal";
+import {AbstractInformatorOrderState, OrdersState, OrderUploadSolutionState} from "./internal";
 import {KeyboardButton, Message, SendMessageOptions} from "node-telegram-bot-api";
 import Status from "../../database/models/Status";
-import {STATUS_FINISHED} from "../../constants";
+import {STATUS_FINISHED, STATUS_NOT_PAYED} from "../../constants";
 
 const keyboardMarkup: Array<Array<KeyboardButton>> = [[{text: 'Вернуться в меню'}, {text: 'Назад'}],
     [{text: 'Вернуться к списку заказов'}]];
 
-export default class OrderSolutionCommentState extends InformatorOrderState {
+export default class OrderSolutionCommentState extends AbstractInformatorOrderState {
 
     async onBackMessage(): Promise<any> {
         await this.resetSolution();
@@ -40,14 +40,15 @@ export default class OrderSolutionCommentState extends InformatorOrderState {
             return stateContext.sendMessage('Комментарий должен содержать символы');
         }
         this.order.solutionComment = message.text;
-        const status = await Status.findOne({ where: {name: STATUS_FINISHED }});
-        if(!status) {
+        const statuses = stateContext.getBotContext().getStatuses();
+        const statusFound = statuses.find((status) => status.name === STATUS_FINISHED);
+        if(!statusFound) {
             const stateContext = this.stateContext;
             await stateContext.sendMessage('Ошибка сервера, пожалуйста, повторите позже');
             return stateContext.setState(new OrdersState(stateContext));
         }
         await this.order.save();
-        await this.order.$set('status', status);
+        await this.order.$set('status', statusFound);
         await stateContext.sendMessage('Выполненное задание успешно загружено!');
         return stateContext.setState(new OrdersState(stateContext));
     }

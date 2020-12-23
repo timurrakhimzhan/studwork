@@ -1,4 +1,4 @@
-import {AbstractOrdersState, OrderRejectState, OrderPaymentState} from "./internal";
+import {OrderRejectState, OrderPaymentState, AbstractOrdersState} from "./internal";
 import Order from "../../database/models/Order";
 import Status from "../../database/models/Status";
 import {Sequelize} from "sequelize-typescript";
@@ -21,7 +21,8 @@ export default class OrdersState extends AbstractOrdersState {
         this.stateContext = stateContext;
     }
 
-    protected getOrders(): Promise<Array<Order>> {
+
+    protected fetchItems(): Promise<Array<Order>> {
         return Order.findAll({
             where: {
                 chatId: this.stateContext.getChatId(),
@@ -30,7 +31,7 @@ export default class OrdersState extends AbstractOrdersState {
             include: [{
                 model: Status,
                 where: {
-                    name: this.currentStatus
+                    name: this.currentCategory
                 },
             }, {
                 model: WorkType,
@@ -44,7 +45,7 @@ export default class OrdersState extends AbstractOrdersState {
         });
     }
 
-    protected getStatusCounts(): Promise<Array<Status>> {
+    protected fetchStatusCounts(): Promise<Array<Status>> {
         return Status.findAll({
             attributes: ['statusId', 'name',
                 [Sequelize.fn('count', Sequelize.col('orders.orderId')), 'ordersCount']
@@ -60,14 +61,9 @@ export default class OrdersState extends AbstractOrdersState {
         });
     }
 
-    protected generateExtraInlineMarkup(): Array<Array<InlineKeyboardButton>> {
-        const extraInlineMarkup: Array<Array<InlineKeyboardButton>> = []
-        if(!this.currentStatus) {
-            return extraInlineMarkup;
-        }
-        const orders = this.statusOrders[this.currentStatus] as Array<Order>
-        const order = orders[this.currentOrderPosition];
-
+    protected generateExtraInlineMarkup(order: Order): Array<Array<InlineKeyboardButton>> {
+        let extraInlineMarkup: Array<Array<InlineKeyboardButton>> = []
+        extraInlineMarkup = [...extraInlineMarkup, ...super.generateExtraInlineMarkup(order)];
         if(order.status.name === STATUS_NOT_PAYED) {
             extraInlineMarkup.push([{text: 'Оплатить заказ', callback_data: CALLBACK_PAY}])
         }
@@ -80,18 +76,20 @@ export default class OrdersState extends AbstractOrdersState {
     async callbackController(callback: CallbackQuery): Promise<any> {
         const callbackData = callback.data;
         const stateContext = this.stateContext;
-        if(!this.currentStatus) {
+        if(!this.currentCategory) {
             return;
         }
-        const orders = this.statusOrders[this.currentStatus] as Array<Order>;
-        const order = orders[this.currentOrderPosition];
+        await super.callbackController(callback);
+        const orders = this.categoryItemsMap[this.currentCategory];
+        if(!orders) {
+            return;
+        }
+        const order = orders[this.currentItemPosition];
         if(callbackData === CALLBACK_CLIENT_REJECT) {
             await stateContext.setState(new OrderRejectState(stateContext, order));
         }
         if(callbackData === CALLBACK_PAY) {
             await stateContext.setState(new OrderPaymentState(stateContext, order));
         }
-
-        return super.callbackController(callback);
     }
 }

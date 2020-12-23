@@ -1,8 +1,8 @@
-import {InformatorBaseState, MainMenuState, LoginInputState} from "./internal";
+import {AbstractInformatorBaseState, MainMenuState, LoginInputState} from "./internal";
 import {Message} from "node-telegram-bot-api";
 import AuthenticationError from "../../errors/authentication-error";
 
-export default class PasswordInputState extends InformatorBaseState {
+export default class PasswordInputState extends AbstractInformatorBaseState {
     async initState(): Promise<any> {
         return this.stateContext.sendMessage('Введите пароль:');
     }

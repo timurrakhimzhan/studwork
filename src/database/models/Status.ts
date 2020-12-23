@@ -14,8 +14,6 @@ export type StatusMeaning = 'Цена не установлена' | 'Не оп�
 
 export const statuses: Array<StatusName> = [STATUS_PRICE_NOT_ASSIGNED, STATUS_NOT_PAYED,
     STATUS_PAYED, STATUS_FINISHED, STATUS_REJECTED_BY_CLIENT, STATUS_REJECTED_BY_TEACHER];
-export const statusMeanings: Array<StatusMeaning> = ['Цена не установлена', 'Не оплачено', 'Оплачено', 'Завершено',
-    'Отменено клиентом', 'Отменено учителем'];
 
 export const statusMeaningMap: {[key in StatusName]: StatusMeaning} = {
     STATUS_PRICE_NOT_ASSIGNED: 'Цена не установлена',

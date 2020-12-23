@@ -1,8 +1,8 @@
-import {InformatorOrderState, OrderSolutionCommentState} from "./internal";
+import {AbstractInformatorOrderState, OrderSolutionCommentState} from "./internal";
 import {Message} from "node-telegram-bot-api";
 
 
-export default class OrderUploadSolutionState extends InformatorOrderState {
+export default class OrderUploadSolutionState extends AbstractInformatorOrderState {
 
     async initState(): Promise<any> {
         return this.stateContext.sendMessage('Прикрепите файл с выполненным заданием (фотографию, документ, либо архив файлов):');

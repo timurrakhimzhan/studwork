@@ -4,7 +4,7 @@ const backMenu: Array<Array<KeyboardButton>> = [
     [{text: 'Вернуться в меню'}],
 ];
 
-export default class ReceiverBaseState extends AbstractBaseState {
+export default abstract class AbstractReceiverBaseState extends AbstractBaseState {
     stateContext: ReceiverStateContext;
     constructor(context: ReceiverStateContext) {
         super(context);

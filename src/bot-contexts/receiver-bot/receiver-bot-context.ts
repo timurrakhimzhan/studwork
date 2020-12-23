@@ -2,23 +2,27 @@ import AbstractBotContext from "../abstract-bot-context";
 import Feedback from "./feedback";
 import {ReceiverStateContext} from "../../state/receiver-bot/internal";
 import Subject from "../../database/models/Subject";
-import Order from "../../database/models/Order";
 import ContactOption from "../../database/models/ContactOption";
 import Contact from "../../database/models/Contact";
 import WorkType from "../../database/models/WorkType";
+import FeedbackType from "../../database/models/FeedbackType";
+import Status from "../../database/models/Status";
 
 export default class ReceiverBotContext extends AbstractBotContext {
     private subjects: Array<Subject> = []
     private contactOptions: Array<ContactOption> = [];
     private contacts: Array<Contact> = [];
-    private feedBacks: {[key: number]: Feedback | undefined} = {};
+    private feedbackTypes: Array<FeedbackType> = [];
+    private statuses: Array<Status> = []
     private hasGivenFeedback: {[key: number]: boolean | undefined} = {};
 
     init = async () => {
         await Promise.all([
             this.fetchSubjects(),
             this.fetchContactOptions(),
-            this.fetchContacts()
+            this.fetchContacts(),
+            this.fetchStatuses(),
+            this.fetchFeedbackTypes(),
         ]);
     }
 
@@ -45,26 +49,26 @@ export default class ReceiverBotContext extends AbstractBotContext {
         this.contacts = await Contact.findAll();
     }
 
+    fetchStatuses = async () => {
+        this.statuses = await Status.findAll();
+    }
+
+    fetchFeedbackTypes = async () => {
+        this.feedbackTypes = await FeedbackType.findAll();
+    }
+
     getSubjects = () => this.subjects;
 
     getContactOptions = () => this.contactOptions;
 
     getContacts = () => this.contacts;
 
-    getFeedBack = (chatId: number): Feedback => {
-        if(this.feedBacks[chatId]) {
-            return this.feedBacks[chatId] as Feedback;
-        }
-        this.feedBacks[chatId] = new Feedback();
-        return this.feedBacks[chatId] as Feedback;
-    }
+    getStatuses = () => this.statuses;
+
+    getFeedbackTypes = () => this.feedbackTypes;
 
     setFeedbackGiven = (chatId: number, value: boolean = true): void => {
         this.hasGivenFeedback[chatId] = value;
-    }
-
-    resetFeedback = (chatId: number): void => {
-        this.feedBacks[chatId] = new Feedback();
     }
 
     hasFeedbackGiven = (chatId: number): boolean => {

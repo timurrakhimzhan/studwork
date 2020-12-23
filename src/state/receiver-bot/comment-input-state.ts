@@ -1,7 +1,7 @@
-import {DateInputState, UploadFileState, ReceiverOrderState} from "./internal";
+import {DateInputState, UploadFileState, AbstractReceiverOrderState} from "./internal";
 import {CallbackQuery, Message, PreCheckoutQuery} from "node-telegram-bot-api";
 
-class CommentInputState extends ReceiverOrderState {
+class CommentInputState extends AbstractReceiverOrderState {
     async initState () {
         await this.stateContext.sendMessage('Оставьте комментарий к заданию:');
     }

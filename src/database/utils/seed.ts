@@ -5,12 +5,14 @@ import Subject from "../models/Subject";
 import WorkType from "../models/WorkType";
 import SubjectWorkType from "../models/SubjectWorkType";
 import Teacher from "../models/Teacher";
+import FeedbackType, {feedbackTypes} from "../models/FeedbackType";
 
 export default async function seed() {
     await Promise.all([
         fillContactOptions(),
         fillContacts(),
         fillStatuses(),
+        fillFeedbackTypes(),
         fillMockSubjectWorkTypes(),
     ])
     await fillTeachers();
@@ -42,6 +44,13 @@ export async function fillStatuses() {
     const statusesCount = await Status.count();
     if(!statusesCount) {
         return Status.bulkCreate(statuses.map((status) => ({name: status})));
+    }
+}
+
+export async function fillFeedbackTypes() {
+    const feedbackTypesCount = await FeedbackType.count();
+    if(!feedbackTypesCount) {
+        return FeedbackType.bulkCreate(feedbackTypes.map(feedbackType => ({name: feedbackType})))
     }
 }
 

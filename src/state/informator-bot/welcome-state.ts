@@ -1,8 +1,8 @@
-import {InformatorBaseState} from "./internal";
+import {AbstractInformatorBaseState} from "./internal";
 import {Message, SendMessageOptions} from "node-telegram-bot-api";
 import LoginInputState from "./login-input-state";
 
-export default class WelcomeState extends InformatorBaseState {
+export default class WelcomeState extends AbstractInformatorBaseState {
     async sendMessage(message: string, options?: SendMessageOptions): Promise<Message> {
         return super.sendMessage(message, options || {reply_markup: {remove_keyboard: true}});
     }

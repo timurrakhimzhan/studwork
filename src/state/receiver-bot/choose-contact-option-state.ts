@@ -1,4 +1,4 @@
-import {ReceiverOrderState, EmailInputState} from "./internal";
+import {AbstractReceiverOrderState, EmailInputState} from "./internal";
 import {CallbackQuery, Message} from "node-telegram-bot-api";
 import {generateInlineMenu, generateReceipt} from "../../utils/message-utils";
 import MainMenuState from "./main-menu-state";
@@ -6,7 +6,7 @@ import Status from "../../database/models/Status";
 import Teacher from "../../database/models/Teacher";
 import Subject from "../../database/models/Subject";
 
-class ChooseContactOptionState extends ReceiverOrderState {
+class ChooseContactOptionState extends AbstractReceiverOrderState {
     async initState () {
         const stateContext = this.stateContext;
         const botContext = stateContext.getBotContext();

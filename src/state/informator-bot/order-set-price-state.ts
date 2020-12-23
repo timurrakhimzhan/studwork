@@ -1,8 +1,8 @@
-import {OrdersState, OrderPriceCommentState, InformatorOrderState} from "./internal";
+import {OrdersState, OrderPriceCommentState, AbstractInformatorOrderState} from "./internal";
 import {Message} from "node-telegram-bot-api";
 
 
-export default class OrderSetPriceState extends InformatorOrderState {
+export default class OrderSetPriceState extends AbstractInformatorOrderState {
 
     async onBackMessage(): Promise<any> {
         return this.stateContext.setState(new OrdersState(this.stateContext));

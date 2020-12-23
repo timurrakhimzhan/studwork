@@ -1,13 +1,13 @@
-import {InformatorOrderState, OrdersState, OrderSetPriceState} from "./internal";
+import {AbstractInformatorOrderState, OrdersState, OrderSetPriceState} from "./internal";
 import {KeyboardButton, Message, SendMessageOptions} from "node-telegram-bot-api";
 import Status from "../../database/models/Status";
-import {STATUS_NOT_PAYED} from "../../constants";
+import {STATUS_NOT_PAYED, STATUS_REJECTED_BY_CLIENT} from "../../constants";
 
 
 const keyboardMarkup: Array<Array<KeyboardButton>> = [[{text: 'Вернуться в меню'}, {text: 'Назад'}],
     [{text: 'Вернуться к списку заказов'}]];
 
-export default class OrderPriceCommentState extends InformatorOrderState {
+export default class OrderPriceCommentState extends AbstractInformatorOrderState {
 
     async onBackMessage(): Promise<any> {
         await this.resetOrderPrice();
@@ -41,14 +41,15 @@ export default class OrderPriceCommentState extends InformatorOrderState {
             return stateContext.sendMessage('Комментарий должен содержать символы');
         }
         this.order.priceComment = message.text;
-        const status = await Status.findOne({ where: {name: STATUS_NOT_PAYED }});
-        if(!status) {
+        const statuses = stateContext.getBotContext().getStatuses();
+        const statusFound = statuses.find((status) => status.name === STATUS_NOT_PAYED);
+        if(!statusFound) {
             const stateContext = this.stateContext;
             await stateContext.sendMessage('Ошибка сервера, пожалуйста, повторите позже');
             return stateContext.setState(new OrdersState(stateContext));
         }
         await this.order.save();
-        await this.order.$set('status', status);
+        await this.order.$set('status', statusFound);
         await stateContext.sendMessage('Цена успешно установлена!');
         return stateContext.setState(new OrdersState(stateContext));
     }

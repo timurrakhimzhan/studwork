@@ -1,8 +1,8 @@
-import {ChooseSubjectState, ReceiverOrderState, UploadFileState} from "./internal";
+import {ChooseSubjectState, AbstractReceiverOrderState, UploadFileState} from "./internal";
 import {generateInlineMenu} from "../../utils/message-utils";
 import {CallbackQuery, Message} from "node-telegram-bot-api";
 
-export default class ChooseWorkTypeState extends ReceiverOrderState {
+export default class ChooseWorkTypeState extends AbstractReceiverOrderState {
     async initState(): Promise<any> {
         const stateContext = this.stateContext;
         const workTypes = this.order.subject.workTypes;

@@ -6,9 +6,9 @@ export { default as AbstractOrderRejectState } from './../shared/abstract-order-
 export { default as AbstractOrderState } from '../shared/abstract-order-state';
 
 
+export { default as AbstractInformatorBaseState} from './abstract-informator-base-state';
+export { default as AbstractInformatorOrderState } from './abstract-informator-order-state';
 export { default as InformatorStateContext} from './informator-state-context';
-export { default as InformatorBaseState} from './informator-base-state';
-export { default as InformatorOrderState } from './informator-order-state';
 
 export { default as WelcomeState } from './welcome-state';
 export { default as LoginInputState } from './login-input-state';

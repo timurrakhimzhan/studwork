@@ -1,7 +1,7 @@
-import {ReceiverBaseState, CommentInputState, ReceiverOrderState, ChooseWorkTypeState} from "./internal";
+import {AbstractReceiverBaseState, CommentInputState, AbstractReceiverOrderState, ChooseWorkTypeState} from "./internal";
 import {Message} from "node-telegram-bot-api";
 
-class UploadFileState extends ReceiverOrderState {
+class UploadFileState extends AbstractReceiverOrderState {
      async initState() {
         await this.stateContext.sendMessage('Прикрепите файл (фотографию, документ, либо архив файлов) либо укажите тему работы:');
     }

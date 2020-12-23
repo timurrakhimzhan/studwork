@@ -22,7 +22,7 @@ export default class OrdersState extends AbstractOrdersState {
         super(stateContext);
         this.stateContext = stateContext;
     }
-    protected getStatusCounts(): Promise<Array<Status>> {
+    protected fetchStatusCounts(): Promise<Array<Status>> {
         const teacher = this.stateContext.getTeacher();
         if(teacher.isAdmin) {
             return Status.findAll({
@@ -55,13 +55,13 @@ export default class OrdersState extends AbstractOrdersState {
         });
     }
 
-    protected getOrders(): Promise<Array<Order>> {
+    protected fetchItems(): Promise<Array<Order>> {
         const teacher = this.stateContext.getTeacher();
         if(teacher.isAdmin) {
             return Order.findAll({
                 include: [Subject, ContactOption, Teacher, {
                     model: Status,
-                    where: { name: this.currentStatus },
+                    where: { name: this.currentCategory },
                 }, {
                     model: WorkType,
                     include: [{
@@ -77,7 +77,7 @@ export default class OrdersState extends AbstractOrdersState {
             include: [Subject, ContactOption,
             {
                 model: Status,
-                where: { name: this.currentStatus },
+                where: { name: this.currentCategory },
             },
             {
                 model: Teacher,
@@ -95,13 +95,9 @@ export default class OrdersState extends AbstractOrdersState {
         });
     }
 
-    protected generateExtraInlineMarkup(): Array<Array<InlineKeyboardButton>> {
-        const extraInlineMarkup: Array<Array<InlineKeyboardButton>> = []
-        if(!this.currentStatus) {
-            return extraInlineMarkup;
-        }
-        const orders = this.statusOrders[this.currentStatus] as Array<Order>
-        const order = orders[this.currentOrderPosition];
+    protected generateExtraInlineMarkup(order: Order): Array<Array<InlineKeyboardButton>> {
+        let extraInlineMarkup: Array<Array<InlineKeyboardButton>> = []
+        extraInlineMarkup = [...extraInlineMarkup, ...super.generateExtraInlineMarkup(order)];
         if(order.status.name === STATUS_PRICE_NOT_ASSIGNED) {
             extraInlineMarkup.push([{text: 'Установить цену', callback_data: CALLBACK_SET_PRICE}])
             extraInlineMarkup.push([{text: 'Отменить заказ', callback_data: CALLBACK_TEACHER_REJECT}])
@@ -115,11 +111,11 @@ export default class OrdersState extends AbstractOrdersState {
     async callbackController(callback: CallbackQuery): Promise<any> {
         const callbackData = callback.data;
         const stateContext = this.stateContext;
-        if(!this.currentStatus) {
+        if(!this.currentCategory) {
             return;
         }
-        const orders = this.statusOrders[this.currentStatus] as Array<Order>
-        const order = orders[this.currentOrderPosition];
+        const orders = this.categoryItemsMap[this.currentCategory] as Array<Order>
+        const order = orders[this.currentItemPosition];
         if(callbackData === CALLBACK_SET_PRICE) {
             await stateContext.setState(new OrderSetPriceState(stateContext, order));
         }

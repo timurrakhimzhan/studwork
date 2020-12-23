@@ -5,9 +5,9 @@ export { default as AbstractOrdersState } from '../shared/abstract-orders-state'
 export { default as AbstractOrderRejectState } from './../shared/abstract-order-reject-state';
 export { default as AbstractOrderState } from '../shared/abstract-order-state';
 
-export { default as ReceiverBaseState } from './receiver-base-state';
+export { default as AbstractReceiverBaseState } from './abstract-receiver-base-state';
+export { default as AbstractReceiverOrderState } from './abstract-receiver-order-state';
 export { default as ReceiverStateContext } from './receiver-state-context';
-export { default as ReceiverOrderState } from './receiver-order-state';
 
 export { default as WelcomeState } from './welcome-state';
 export { default as MainMenuState } from './main-menu-state';

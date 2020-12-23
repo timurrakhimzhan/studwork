@@ -1,8 +1,8 @@
-import {DateInputState, PhoneInputState, ReceiverOrderState} from "./internal";
+import {DateInputState, PhoneInputState, AbstractReceiverOrderState} from "./internal";
 import {Message} from "node-telegram-bot-api";
 import moment from 'moment';
 
-class TimeInputState extends ReceiverOrderState {
+class TimeInputState extends AbstractReceiverOrderState {
     async initState(): Promise<any> {
         await this.stateContext.sendMessage('Введите время сдачи работы, например 14:30')
     }

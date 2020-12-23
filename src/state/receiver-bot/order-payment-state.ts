@@ -49,13 +49,14 @@ export default class OrderPaymentState extends AbstractOrderState {
             await stateContext.sendMessage('Произошла ошибка во время оплаты. Пожалуйста, повторите позже');
             return stateContext.setState(new OrdersState(stateContext));
         }
-        const status = await Status.findOne({ where: {name: STATUS_PAYED }});
-        if(!status) {
+        const statuses = stateContext.getBotContext().getStatuses();
+        const statusFound = statuses.find((status) => status.name === STATUS_PAYED)
+        if(!statusFound) {
             const stateContext = this.stateContext;
             await stateContext.sendMessage('Ошибка сервера, пожалуйста, повторите позже');
             return stateContext.setState(new OrdersState(stateContext));
         }
-        await this.order.$set('status', status);
+        await this.order.$set('status', statusFound);
         this.invoiceMessageIdToDelete = null;
         await stateContext.sendMessage('Оплата прошла успешно, мы с Вами свяжемся.');
         await stateContext.setState(new OrdersState(stateContext));

@@ -23,7 +23,6 @@ export default class ReceiverStateContext extends AbstractStateContext {
         }
         if(message.text?.trim() === '/start') {
             botContext.setFeedbackGiven(this.getChatId(), false);
-            botContext.resetFeedback(this.getChatId());
             await this.setState(new WelcomeState(this))
         }
         return super.messageController(message);

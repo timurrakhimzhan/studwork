@@ -1,11 +1,11 @@
-import {InformatorBaseState, OrdersState} from "./internal";
+import {AbstractInformatorBaseState, OrdersState} from "./internal";
 import {KeyboardButton, Message, SendMessageOptions} from "node-telegram-bot-api";
 
 const mainMenu: Array<Array<KeyboardButton>> =  [
     [{text: 'Мои заказы'}, {text: 'Выйти из учетной записи'}]
 ];
 
-export default class MainMenuState extends InformatorBaseState {
+export default class MainMenuState extends AbstractInformatorBaseState {
 
     async sendMessage(message: string, options?: SendMessageOptions): Promise<Message> {
         return super.sendMessage(message, options || {reply_markup: {keyboard: mainMenu, resize_keyboard: true}});
