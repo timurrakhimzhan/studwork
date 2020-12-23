@@ -21,6 +21,7 @@ import {
     STATUS_PRICE_NOT_ASSIGNED
 } from "../../constants";
 import OrderUploadSolutionState from "./order-upload-solution-state";
+import LoginInputState from "./login-input-state";
 
 export default class OrdersState extends AbstractOrdersState {
     stateContext: InformatorStateContext;
@@ -112,15 +113,6 @@ export default class OrdersState extends AbstractOrdersState {
             extraInlineMarkup.push([{text: 'Загрузить выполненное задание', callback_data: CALLBACK_UPLOAD_SOLUTION}])
         }
         return extraInlineMarkup;
-    }
-
-    async messageController(message: Message): Promise<any> {
-        const stateContext = this.stateContext;
-        const isSessionActive = await stateContext.getIsSessionActive()
-        if(!isSessionActive) {
-            return stateContext.setState(new WelcomeState(stateContext));
-        }
-        return super.messageController(message);
     }
 
     async callbackController(callback: CallbackQuery): Promise<any> {

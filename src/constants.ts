@@ -1,6 +1,16 @@
 import {StatusName} from "./database/models/Status";
 import {FeedbackTypeName} from "./database/models/FeedbackType";
 
+
+export const URL_WHATSAPP = 'https://wa.me/77756818268';
+export const URL_TELEGRAM = 'https://t.me/StudWorkk';
+
+export const CALLBACK_PHONE_OPTION = 'CALLBACK_PHONE_OPTION';
+export const CALLBACK_EMAIL_OPTION = 'CALLBACK_EMAIL_OPTION';
+export const CALLBACK_TELEGRAM_OPTION = 'CALLBACK_TELEGRAM_OPTION';
+
+export const CALLBACK_PHONE_CALL = 'CALLBACK_PHONE_CALL'
+
 export const CALLBACK_CLIENT_FILE = 'CALLBACK_CLIENT_FILE';
 export const CALLBACK_CLIENT_REJECT = 'CALLBACK_CLIENT_REJECT';
 export const CALLBACK_TEACHER_REJECT = 'CALLBACK_TEACHER_REJECT';

@@ -7,9 +7,13 @@ export default class WelcomeState extends AbstractInformatorBaseState {
         return super.sendMessage(message, options || {reply_markup: {remove_keyboard: true}});
     }
 
-    async messageController(message: Message): Promise<any> {
+    async initState(): Promise<any> {
         const stateContext = this.stateContext;
         await stateContext.sendMessage('Здравствуйте! Чтобы пользоваться ботом, необходимо авторизоваться в систему!');
         await stateContext.setState(new LoginInputState(stateContext));
+    }
+
+    async messageController(message: Message): Promise<any> {
+        return this.stateContext.initState();
     }
 }

@@ -6,6 +6,12 @@ import WorkType from "../models/WorkType";
 import SubjectWorkType from "../models/SubjectWorkType";
 import Teacher from "../models/Teacher";
 import FeedbackType, {feedbackTypes} from "../models/FeedbackType";
+import {
+    CALLBACK_EMAIL_OPTION,
+    CALLBACK_PHONE_CALL,
+    CALLBACK_PHONE_OPTION,
+    CALLBACK_TELEGRAM_OPTION, URL_TELEGRAM, URL_WHATSAPP
+} from "../../constants";
 
 export default async function seed() {
     await Promise.all([
@@ -22,9 +28,9 @@ export async function fillContactOptions() {
     const contactOptionsCount = await ContactOption.count();
     if(!contactOptionsCount) {
         return ContactOption.bulkCreate([
-            {name: 'Телефон', callback: 'Телефон'},
-            {name: 'Почта', callback: 'Почта'},
-            {name: 'Этот Telegram аккаунт', callback: 'Telegram'}
+            {name: 'Телефон', callback: CALLBACK_PHONE_OPTION},
+            {name: 'Почта', callback: CALLBACK_EMAIL_OPTION},
+            {name: 'Этот Telegram аккаунт', callback: CALLBACK_TELEGRAM_OPTION}
         ])
     }
 }
@@ -33,9 +39,9 @@ export async function fillContacts() {
     const contactsCount = await Contact.count();
     if(!contactsCount) {
         return Contact.bulkCreate([
-            {name: 'Позвонить', callback: 'Позвонить'},
-            {name: 'Whatsapp', url: 'https://wa.me/77756818268'},
-            {name: 'Telegram', url: 'https://t.me/StudWorkk'}
+            {name: 'Позвонить', callback: CALLBACK_PHONE_CALL},
+            {name: 'Whatsapp', url: URL_WHATSAPP},
+            {name: 'Telegram', url: URL_TELEGRAM}
         ]);
     }
 }
@@ -106,7 +112,7 @@ export async function fillTeachers() {
         mock: true,
         login: 'math',
         password: 'password',
-        name: 'Матеатик Математиков',
+        name: 'Математик Математиков',
     });
     await mathTeacher.save();
     await mathTeacher.$set('subjects', subjects.filter((subject) => subject.name === 'Математика'));

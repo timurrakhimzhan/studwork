@@ -1,5 +1,6 @@
 import {AbstractInformatorBaseState, OrdersState, WelcomeState, FeedbacksState} from "./internal";
 import {KeyboardButton, Message, SendMessageOptions} from "node-telegram-bot-api";
+import LoginInputState from "./login-input-state";
 
 const keyboardMarkup: Array<Array<KeyboardButton>> =  [
     [{text: 'Мои заказы'}, {text: 'Выйти из учетной записи'}]
@@ -26,10 +27,6 @@ export default class MainMenuState extends AbstractInformatorBaseState {
 
     async messageController(message: Message): Promise<any> {
         const stateContext = this.stateContext;
-        const isSessionActive = await stateContext.getIsSessionActive()
-        if(!isSessionActive) {
-            return stateContext.setState(new WelcomeState(stateContext));
-        }
         if(message.text?.trim() === 'Мои заказы') {
             return stateContext.setState(new OrdersState(stateContext));
         }

@@ -9,6 +9,7 @@ import {generateInlineMenu, generatePriceList, generateSubjectsMessage} from "..
 import {OrdersState} from "./internal";
 import Order from "../../database/models/Order";
 import Feedback from "../../database/models/Feedback";
+import {CALLBACK_PHONE_CALL} from "../../constants";
 
 const mainMenu: Array<Array<KeyboardButton>> =  [
     [{text: 'Предметы'}, {text: 'Прайс-лист'}],
@@ -65,7 +66,7 @@ class MainMenuState extends AbstractReceiverBaseState {
         const botContext = stateContext.getBotContext();
         const bot = botContext.getBot();
         await bot.answerCallbackQuery(callback.id);
-        if(callbackData === 'Позвонить') {
+        if(callbackData === CALLBACK_PHONE_CALL) {
             await bot.sendContact(stateContext.getChatId(), '+77756818268', 'StudWork');
         }
         const subjectForPrice = botContext.getSubjects().find((subject) => subject.name === callbackData)

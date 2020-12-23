@@ -25,7 +25,11 @@ export default class InformatorStateContext extends AbstractStateContext {
     getIsLoggedIn = () => this.isLoggedIn;
 
     async getIsSessionActive(): Promise<boolean> {
-        await this.teacher.reload();
+        try {
+            await this.teacher.reload();
+        } catch(e) {
+            return false;
+        }
         const chatId: number | null = this.teacher.chatId;
         if(chatId === this.getChatId()) {
             return true;
@@ -66,6 +70,11 @@ export default class InformatorStateContext extends AbstractStateContext {
         }
         if(!this.getIsLoggedIn())  {
             return super.messageController(message);
+        }
+        const isSessionActive = await this.getIsSessionActive()
+        if(!isSessionActive) {
+            await this.sendMessage('Ваша сессия истекла!');
+            return this.setState(new LoginInputState(this));
         }
         if(message.text?.trim() === 'Вернуться в меню') {
             return this.setState(new MainMenuState(this));
