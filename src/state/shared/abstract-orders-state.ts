@@ -7,17 +7,26 @@ import {generateReceipt, getBufferFromUrl} from "../../utils/message-utils";
 import AbstractStateContext from "../abstract-state-context";
 
 export default abstract class AbstractOrdersState extends AbstractItemsState<Status, StatusName, Order> {
+    private readonly initMessage: string | null;
+    private notification: boolean;
     async initState(): Promise<any> {
         const statusCounts = await this.fetchStatusCounts();
         statusCounts.forEach((statusCount) => {
             this.categoryCountMap[statusCount.get('name')] = parseInt(statusCount.get('ordersCount') as string)
         })
-        await this.stateContext.sendMessage('Выберите статус заказа:');
+        if(this.notification) {
+            this.notification = false;
+            return this.stateContext.sendMessage(this.initMessage || 'Выберите статус заказа:');
+        }
+        return this.stateContext.sendMessage('Выберите статус заказа:');
+
     }
 
-    protected constructor(stateContext: AbstractStateContext) {
+    protected constructor(stateContext: AbstractStateContext, initMessage?: string) {
         const statuses = stateContext.getBotContext().getStatuses().map((status) => status.name);
         super(stateContext, statuses, statusMeaningMap);
+        this.initMessage = initMessage || null;
+        this.notification = !!initMessage;
     }
 
     protected generateExtraInlineMarkup(order: Order): Array<Array<InlineKeyboardButton>> {

@@ -25,8 +25,8 @@ import LoginInputState from "./login-input-state";
 
 export default class OrdersState extends AbstractOrdersState {
     stateContext: InformatorStateContext;
-    constructor(stateContext: InformatorStateContext) {
-        super(stateContext);
+    constructor(stateContext: InformatorStateContext, initMessage?: string) {
+        super(stateContext, initMessage);
         this.stateContext = stateContext;
     }
     protected fetchStatusCounts(): Promise<Array<Status>> {

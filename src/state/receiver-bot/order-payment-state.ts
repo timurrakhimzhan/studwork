@@ -1,11 +1,7 @@
 import Order from "../../database/models/Order";
 import {LabeledPrice, Message, SendMessageOptions} from "node-telegram-bot-api";
 import {OrdersState, ReceiverStateContext, AbstractOrderState} from "./internal";
-import Status from "../../database/models/Status";
 import {STATUS_PAYED} from "../../constants";
-import Teacher from "../../database/models/Teacher";
-import {Op} from "sequelize";
-import {generateTeacherNotification} from "../../utils/message-utils";
 
 export default class OrderPaymentState extends AbstractOrderState {
     stateContext: ReceiverStateContext;

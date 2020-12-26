@@ -16,11 +16,10 @@ import ReceiverStateContext from "./receiver-state-context";
 export default class OrdersState extends AbstractOrdersState {
     stateContext: ReceiverStateContext;
 
-    constructor(stateContext: ReceiverStateContext) {
-        super(stateContext);
+    constructor(stateContext: ReceiverStateContext, initMessage?: string) {
+        super(stateContext, initMessage);
         this.stateContext = stateContext;
     }
-
 
     protected fetchItems(): Promise<Array<Order>> {
         return Order.findAll({

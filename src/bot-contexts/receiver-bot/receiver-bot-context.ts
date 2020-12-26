@@ -1,5 +1,4 @@
 import AbstractBotContext from "../abstract-bot-context";
-import Feedback from "./feedback";
 import {ReceiverStateContext} from "../../state/receiver-bot/internal";
 import Subject from "../../database/models/Subject";
 import ContactOption from "../../database/models/ContactOption";
@@ -9,6 +8,7 @@ import FeedbackType from "../../database/models/FeedbackType";
 import Status from "../../database/models/Status";
 import App from "../../App";
 import TelegramBot from "node-telegram-bot-api";
+import Order from "../../database/models/Order";
 
 export default class ReceiverBotContext extends AbstractBotContext {
     private subjects: Array<Subject> = []
@@ -32,8 +32,8 @@ export default class ReceiverBotContext extends AbstractBotContext {
         ]);
     }
 
-    async notifyInformatorBot(chatIds: Array<number>, message: string): Promise<any> {
-        return this.app.notifyInformatorBot(chatIds, message)
+    async notifyInformatorBot(chatIds: Array<number>, order: Order): Promise<any> {
+        return this.app.notifyInformatorBot(chatIds, order)
     }
 
     getChatStateContext(chatId: number): ReceiverStateContext {

@@ -1,21 +1,9 @@
 import App from "./App";
-import runServer from "./server";
 import dotenv from 'dotenv';
 import 'reflect-metadata';
 import connectDatabase from "./connections/connect-database";
 import ReceiverBotContext from "./bot-contexts/receiver-bot";
 import seed from "./database/utils/seed";
-import Order from "./database/models/Order";
-import Status from "./database/models/Status";
-import {Sequelize} from "sequelize-typescript";
-import Teacher from "./database/models/Teacher";
-import WorkType from "./database/models/WorkType";
-import ContactOption from "./database/models/ContactOption";
-import {STATUS_PRICE_NOT_ASSIGNED, STATUS_REJECTED_BY_CLIENT} from "./constants";
-import Subject from "./database/models/Subject";
-import FeedbackType from "./database/models/FeedbackType";
-import Feedback from "./database/models/Feedback";
-import {Op} from "sequelize";
 dotenv.config();
 
 
@@ -29,7 +17,6 @@ const initSubjectsPolling = async (botContext: ReceiverBotContext) => {
 }
 
 const app = async () => {
-    runServer();
     await connectDatabase();
     await seed();
     console.log('Database is filled');

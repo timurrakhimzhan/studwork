@@ -3,6 +3,7 @@ import TelegramBot from "node-telegram-bot-api";
 import Status from "../database/models/Status";
 import FeedbackType from "../database/models/FeedbackType";
 import App from "../App";
+import Order from "../database/models/Order";
 
 export default abstract class AbstractBotContext {
     protected chatStateContext: { [key: number]: AbstractStateContext | undefined } = {};
@@ -18,10 +19,10 @@ export default abstract class AbstractBotContext {
 
     getFeedbackTypes = () => this.feedbackTypes;
 
-    async notifyAboutOrders (chatIds: Array<number>, message: string) {
+    async notifyAboutOrders (chatIds: Array<number>, order: Order) {
         await Promise.all(chatIds.map(async (chatId) => {
             const stateContext = this.getChatStateContext(chatId);
-            await stateContext.notifyAboutOrder(message)
+            await stateContext.notifyAboutOrder(order)
         }))
     }
 

@@ -4,7 +4,7 @@ import Teacher from "../../database/models/Teacher";
 import AuthenticationError from "../../errors/authentication-error";
 import {Message} from "node-telegram-bot-api";
 import Order from "../../database/models/Order";
-import {generateClientNotification} from "../../utils/message-utils";
+import {generateClientNotification, generateTeacherNotification} from "../../utils/message-utils";
 
 export default class InformatorStateContext extends AbstractStateContext {
     protected readonly botContext: InformatorBotContext;
@@ -70,16 +70,16 @@ export default class InformatorStateContext extends AbstractStateContext {
         return this.botContext;
     }
 
-    async notifyAboutOrder(message: string) {
+    async notifyAboutOrder(order: Order) {
         if(this.getIsLoggedIn()) {
-            await this.sendMessage(message, {parse_mode: 'Markdown'});
-            await this.setState(new OrdersState(this));
+            const message: string = generateTeacherNotification(order, this.teacher.isAdmin);
+            await this.setState(new OrdersState(this, message));
         }
     }
 
     async notifyReceiverBot(order: Order) {
         const chatId = order.chatId as number;
-        await this.getBotContext().notifyReceiverBot([chatId], generateClientNotification(order));
+        await this.getBotContext().notifyReceiverBot([chatId], order);
     }
 
     async messageController(message: Message): Promise<any> {

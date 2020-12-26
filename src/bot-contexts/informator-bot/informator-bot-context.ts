@@ -6,6 +6,7 @@ import Teacher from "../../database/models/Teacher";
 import {Op} from "sequelize";
 import TelegramBot from "node-telegram-bot-api";
 import App from "../../App";
+import Order from "../../database/models/Order";
 
 export default class InformatorBotContext extends AbstractBotContext {
     private app: App;
@@ -23,8 +24,8 @@ export default class InformatorBotContext extends AbstractBotContext {
         ])
     }
 
-    async notifyReceiverBot(chatIds: Array<number>, message: string): Promise<any> {
-        return this.app.notifyReceiverBot(chatIds, message)
+    async notifyReceiverBot(chatIds: Array<number>, order: Order): Promise<any> {
+        return this.app.notifyReceiverBot(chatIds, order)
     }
 
     fetchStatuses = async () => {

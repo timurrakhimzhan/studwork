@@ -19,7 +19,7 @@ export const generateInlineKeyboard = (month: number, year: number): Array<Array
         let finished = false;
         for(let weekDay = 0; weekDay < 7; weekDay++) {
             const date =  new Date(`${year}-${month}-${day}`);
-            if(isNaN(date.getDate())) {
+            if(isNaN(date.getDate()) || date.getMonth() + 1 !== month) {
                 finished = true;
                 keyboardRow.push({text: ' ', callback_data: DATE_INPUT_DAY});
                 continue;

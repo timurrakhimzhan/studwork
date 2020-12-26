@@ -1,6 +1,7 @@
 import {connectInformatorBot, connectReceiverBot} from "./connections/connect-telegram-bots";
 import ReceiverBotContext from "./bot-contexts/receiver-bot";
 import InformatorBotContext from "./bot-contexts/informator-bot";
+import Order from "./database/models/Order";
 
 class App {
 
@@ -18,14 +19,14 @@ class App {
         ]);
     }
 
-    async notifyReceiverBot(chatIds: Array<number>, message: string): Promise<any> {
+    async notifyReceiverBot(chatIds: Array<number>, order: Order): Promise<any> {
         const botContext = this.getReceiverBotContext();
-        return botContext.notifyAboutOrders(chatIds, message)
+        return botContext.notifyAboutOrders(chatIds, order)
     }
 
-    async notifyInformatorBot(chatIds: Array<number>, message: string): Promise<any> {
+    async notifyInformatorBot(chatIds: Array<number>, order: Order): Promise<any> {
         const botContext = this.getInformatorBotContext();
-        return botContext.notifyAboutOrders(chatIds, message)
+        return botContext.notifyAboutOrders(chatIds, order)
     }
 
     getReceiverBotContext = (): ReceiverBotContext => this.receiverBotContext as ReceiverBotContext;

@@ -1,13 +1,11 @@
 import {AbstractReceiverOrderState, EmailInputState} from "./internal";
 import {CallbackQuery, Message} from "node-telegram-bot-api";
-import {generateInlineMenu, generateReceipt, generateTeacherNotification} from "../../utils/message-utils";
+import {generateInlineMenu, generateReceipt} from "../../utils/message-utils";
 import MainMenuState from "./main-menu-state";
-import Status from "../../database/models/Status";
 import Teacher from "../../database/models/Teacher";
 import Subject from "../../database/models/Subject";
 import Order from "../../database/models/Order";
 import {Sequelize} from "sequelize-typescript";
-import {Op} from "sequelize";
 import {STATUS_PRICE_NOT_ASSIGNED} from "../../constants";
 
 class ChooseContactOptionState extends AbstractReceiverOrderState {
@@ -29,8 +27,13 @@ class ChooseContactOptionState extends AbstractReceiverOrderState {
         const stateContext = this.stateContext;
         const botContext = stateContext.getBotContext();
         const contactOptionFound = botContext.getContactOptions().find((contactOption) => contactOption.callback === callbackData);
+        if(!contactOptionFound) {
+            await stateContext.sendMessage('Извините, произошла ошибка обработки заказа, пожалуйста, попробуйте оформить заказ через час.')
+            await stateContext.setState(new MainMenuState(stateContext));
+            return;
+        }
         const statusPriceNotAssigned = botContext.getStatuses().find(status => status.name === STATUS_PRICE_NOT_ASSIGNED);
-        await botContext.getBot().editMessageText(`Выбран вариант: *${callbackData}*.`, {
+        await botContext.getBot().editMessageText(`Выбран вариант: *${contactOptionFound.name}*.`, {
             chat_id: stateContext.getChatId(),
             message_id: message.message_id,
             parse_mode: 'Markdown',
@@ -51,7 +54,7 @@ class ChooseContactOptionState extends AbstractReceiverOrderState {
                 {
                     model: Subject,
                     where: {
-                        name: 'Математика',
+                        subjectId: order.subject.subjectId,
                         mock: !!process.env['MOCK'],
                     },
                     duplicating: false,
@@ -78,7 +81,7 @@ class ChooseContactOptionState extends AbstractReceiverOrderState {
             return;
         }
 
-        if(!statusPriceNotAssigned || !teacher || !contactOptionFound) {
+        if(!statusPriceNotAssigned) {
             await stateContext.sendMessage('Извините, произошла ошибка обработки заказа, пожалуйста, попробуйте оформить заказ через час.')
             await stateContext.setState(new MainMenuState(stateContext));
             return;

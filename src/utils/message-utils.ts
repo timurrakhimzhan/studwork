@@ -109,8 +109,12 @@ export const generateFeedbackInfo = (feedback: Feedback) => {
         `Комментарий: *${feedback.comment}*`;
 }
 
-export const generateTeacherNotification = (order: Order) => {
-    const lastLine = `Для более подробной информации, выберите статус заказа: *${statusMeaningMap[order.status.name]}*`;
+export const generateTeacherNotification = (order: Order, isAdmin: boolean = false) => {
+    let lastLine = `Для более подробной информации, выберите статус заказа: *${statusMeaningMap[order.status.name]}*`;
+    if(isAdmin) {
+        lastLine = lastLine + `\n` +
+            `Учитель: *${order.teacher?.name || 'Имя не указано'}*`;
+    }
     if(order.status.name === STATUS_PRICE_NOT_ASSIGNED) {
         const formatter =  Intl.DateTimeFormat(['ru-RU'], {day: 'numeric', month: 'long', year: 'numeric'});
         return `*Новый заказ!* \n` +

@@ -1,6 +1,7 @@
 import {CallbackQuery, Message, SendMessageOptions} from "node-telegram-bot-api";
 import AbstractBotContext from "../bot-contexts";
 import {AbstractBaseState} from "./internal";
+import Order from "../database/models/Order";
 
 abstract class AbstractStateContext {
     protected state: AbstractBaseState;
@@ -26,7 +27,7 @@ abstract class AbstractStateContext {
 
     public getLastMessageId = () => this.lastMessageId;
 
-    public abstract notifyAboutOrder(message: string): Promise<any>;
+    public abstract notifyAboutOrder(order: Order): Promise<any>;
 
     public sendMessage = async (message: string, options?: SendMessageOptions) => {
         await this.state.onNewMessage();
