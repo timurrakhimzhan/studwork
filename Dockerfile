@@ -1,7 +1,8 @@
 FROM node:12-alpine
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json ./
 RUN npm install -g typescript
 RUN npm install
 COPY . ./
-RUN npm run mock-prod
+EXPOSE 5432 5432
+CMD npm run mock-prod
