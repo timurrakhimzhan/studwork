@@ -12,8 +12,8 @@ import Feedback from "../../database/models/Feedback";
 import {CALLBACK_PHONE_CALL} from "../../constants";
 
 const mainMenu: Array<Array<KeyboardButton>> =  [
+    [{text: 'Мои заказы'}, {text: 'Заказать работу'}],
     [{text: 'Предметы'}, {text: 'Прайс-лист'}],
-    [{text: 'Заказать работу'}, {text: 'Мои заказы'}],
     [{text: 'Контакты'}, {text: 'Оценить работу бота'}]
 ];
 

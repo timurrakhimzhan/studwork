@@ -15,7 +15,7 @@ export default class PasswordInputState extends AbstractInformatorBaseState {
         const teacher = stateContext.getTeacher();
         teacher.password = message.text;
         try {
-            await stateContext.login();
+            await stateContext.login(message.chat.username);
         } catch (error) {
             if(error instanceof AuthenticationError) {
                 await stateContext.sendMessage('Неверное сочетание логина и пароля, повторите еще раз');

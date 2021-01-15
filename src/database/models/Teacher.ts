@@ -23,6 +23,9 @@ export default class Teacher extends Model {
     @Column({allowNull: false})
     name!: string;
 
+    @Column({type: DataType.STRING, allowNull: true})
+    userName!: string | null;
+
     @HasMany(() => Order, 'teacherId')
     orders!: Array<Order>;
 

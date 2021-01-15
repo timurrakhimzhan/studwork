@@ -1,10 +1,4 @@
-import {
-    AbstractOrdersState,
-    OrderSetPriceState,
-    InformatorStateContext,
-    OrderRejectState,
-    WelcomeState
-} from "./internal";
+import {AbstractOrdersState, InformatorStateContext, OrderRejectState, OrderSetPriceState} from "./internal";
 import Status from "../../database/models/Status";
 import {Sequelize} from "sequelize-typescript";
 import Order from "../../database/models/Order";
@@ -12,7 +6,7 @@ import Teacher from "../../database/models/Teacher";
 import Subject from "../../database/models/Subject";
 import WorkType from "../../database/models/WorkType";
 import ContactOption from "../../database/models/ContactOption";
-import {CallbackQuery, InlineKeyboardButton, Message} from "node-telegram-bot-api";
+import {CallbackQuery, InlineKeyboardButton} from "node-telegram-bot-api";
 import {
     CALLBACK_SET_PRICE,
     CALLBACK_TEACHER_REJECT,
@@ -21,7 +15,7 @@ import {
     STATUS_PRICE_NOT_ASSIGNED
 } from "../../constants";
 import OrderUploadSolutionState from "./order-upload-solution-state";
-import LoginInputState from "./login-input-state";
+import {generateReceipt} from "../../utils/message-utils";
 
 export default class OrdersState extends AbstractOrdersState {
     stateContext: InformatorStateContext;
@@ -102,6 +96,10 @@ export default class OrdersState extends AbstractOrdersState {
         });
     }
 
+    protected generateItemMessage(item: Order): string {
+        return generateReceipt(item, true, this.stateContext.getTeacher().isAdmin)
+    }
+
     protected generateExtraInlineMarkup(order: Order): Array<Array<InlineKeyboardButton>> {
         let extraInlineMarkup: Array<Array<InlineKeyboardButton>> = []
         extraInlineMarkup = [...extraInlineMarkup, ...super.generateExtraInlineMarkup(order)];
@@ -121,7 +119,7 @@ export default class OrdersState extends AbstractOrdersState {
         if(!this.currentCategory) {
             return;
         }
-        const orders = this.categoryItemsMap[this.currentCategory] as Array<Order>
+        const orders = this.categoryItemsMap[this.currentCategory] as Array<Order>;
         const order = orders[this.currentItemPosition];
         if(callbackData === CALLBACK_SET_PRICE) {
             await stateContext.setState(new OrderSetPriceState(stateContext, order));

@@ -44,7 +44,7 @@ export default class InformatorStateContext extends AbstractStateContext {
         return false;
     }
 
-    async login() {
+    async login(username?: string) {
         const teacher = await Teacher.findOne({ where: {
             login: this.teacher.login,
             mock: !!process.env['MOCK']
@@ -53,6 +53,7 @@ export default class InformatorStateContext extends AbstractStateContext {
             throw new AuthenticationError('Wrong password')
         }
         teacher.chatId = this.getChatId();
+        teacher.userName = username || null;
         await teacher.save();
         this.teacher = teacher;
         this.isLoggedIn = true;
@@ -85,7 +86,7 @@ export default class InformatorStateContext extends AbstractStateContext {
     async messageController(message: Message): Promise<any> {
         if(message.text?.trim() === '/start') {
             this.resetTeacher();
-            await this.setState(new WelcomeState(this));
+            return this.setState(new WelcomeState(this));
         }
         if(!this.getIsLoggedIn())  {
             return super.messageController(message);

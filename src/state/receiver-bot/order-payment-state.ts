@@ -19,7 +19,7 @@ export default class OrderPaymentState extends AbstractOrderState {
 
     async initState(): Promise<any> {
         const stateContext = this.stateContext;
-        const paymentToken = process.env['MOCK'] ? process.env['TG_PAYMENT_TOKEN_MOCK'] : process.env['TG_PAYMENT_TOKEN'];
+        const paymentToken = process.env['DEV'] ? process.env['TG_PAYMENT_TOKEN_DEV'] : process.env['TG_PAYMENT_TOKEN_PROD'];
         const priceNum = this.order.price;
         if(!priceNum || !paymentToken) {
             await stateContext.sendMessage('Прозошла непредвиденная ошибка. Свяжитесь с службой поддержки.');
@@ -29,13 +29,14 @@ export default class OrderPaymentState extends AbstractOrderState {
         const title = 'Оплата заявки';
         const description = 'Пожалуйста, оплатите ' + priceNum + 'тг, чтобы продолжить.'
         const startParam = 'pay';
-        const currency = 'KZT';
-        const price: LabeledPrice = {label: priceNum + ' тг ', amount: priceNum * 100};
+        const currency = 'RUB';
+        const price: LabeledPrice = {label: priceNum + ' тг ', amount: priceNum * 100 };
         try {
             const invoiceMessage = await stateContext.getBotContext().getBot().sendInvoice(stateContext.getChatId(), title, description, payload, paymentToken, startParam, currency, [price]);
             await this.onNewMessage();
             this.invoiceMessageIdToDelete = invoiceMessage.message_id;
         } catch (e) {
+            console.log(e);
             await stateContext.sendMessage('Прозошла непредвиденная ошибка. Свяжитесь с службой поддержки.');
             await stateContext.setState(new OrdersState(stateContext));
         }

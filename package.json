@@ -5,7 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --icu-data-dir=node_modules/full-icu ./dist/index.js",
-    "mock": "tsc && MOCK=true node --icu-data-dir=node_modules/full-icu ./dist/index.js"
+    "mock-dev": "tsc && MOCK=true DEV=true node --icu-data-dir=node_modules/full-icu ./dist/index.js",
+    "mock-prod": "tsc && MOCK=true PROD=true node --icu-data-dir=node_modules/full-icu ./dist/index.js",
+    "mock-prod-remote": "tsc && MOCK=true PROD=true REMOTE=true node --icu-data-dir=node_modules/full-icu ./dist/index.js"
   },
   "author": "",
   "license": "ISC",

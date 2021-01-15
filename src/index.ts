@@ -39,6 +39,7 @@ const app = async () => {
         return app.getReceiverBotContext().getChatStateContext(cb.message?.chat.id).callbackController(cb);
     });
     receiverBot.on('pre_checkout_query', (preCq) => {
+        console.log(preCq);
         return receiverBot.answerPreCheckoutQuery(preCq.id, true);
     })
 

@@ -9,7 +9,7 @@ const connectDatabase = () => {
             database: process.env['DB_NAME'],
             password: process.env['DB_PASSWORD'],
             dialect: 'postgres',
-            host: 'localhost',
+            host: process.env['REMOTE'] ? process.env['DB_HOST'] : 'localhost',
             port: 5432,
             sync: {
                 force: false,

@@ -56,7 +56,7 @@ export const getBufferFromUrl = async(url: string): Promise<Buffer> => {
     return Buffer.from(response.data, 'binary');
 }
 
-export const generateReceipt = (order: Order) => {
+export const generateReceipt = (order: Order, isTeacher: boolean = false, isAdmin: boolean = false) => {
     const userName = order.username ? '@' + order.username : '*Юзернейм не указан*';
     const formatter =  Intl.DateTimeFormat(['ru-RU'], {day: 'numeric', month: 'long', year: 'numeric'});
     const date = formatter.format(order.datetime);
@@ -79,24 +79,29 @@ export const generateReceipt = (order: Order) => {
     }
     if(order.status.name === STATUS_FINISHED) {
         extraInfo = extraInfo + ` \n` +
-            `Цена: *${order.price}* \n` +
+            `Цена: *${order.price}тг* \n` +
             `Комментарий к цене: *${order.priceComment}* \n` +
             `Комментарий к выполненному заданию: *${order.solutionComment}*`
     }
+    if(isAdmin) {
+        extraInfo = extraInfo + ` \n` +
+            `Имя учителя: *${order.teacher ? order.teacher.name : 'Не указано'}* \n` +
+            `Юзернейм учителя: *${order.teacher?.userName ? '@' + order.teacher.userName : 'Не указано'}* \n`;
+    }
     return `*Заказ #${order.orderId}* \n` +
         `Имя клиента: *${order.clientName}* \n` +
-        `Юзернейм клиента: ${userName} \n` +
+        (isAdmin ? `Юзернейм клиента: ${userName} \n` : '') +
         `Предмет: *${order.subject.name}* \n` +
         `Тип работы: *${order.workType.name}*\n` +
-        `Цена в прайс-листе: *${minPrice}*\n` +
+        `Цена в прайс-листе: *${minPrice}тг*\n` +
         `Тема работы: *${order.topic || 'Тема не указана'}*\n` +
         `Файл: *${order.assignmentUrl ? 'Прикреплен' : 'Не прикреплен'}*\n` +
         `Комментарий клиента: *${order.comment}* \n` +
         `Дата сдачи: *${date}* \n` +
         `Время: *${time}* \n` +
-        `Телефон клиента: *${order.phone}* \n` +
-        `Почта клиента: *${order.email}* \n` +
-        `Как связаться: *${order.contactOption.name}* \n` +
+        (isAdmin || !isTeacher ? `Телефон клиента: *${order.phone}* \n` : '') +
+        (isAdmin || !isTeacher ? `Почта клиента: *${order.email}* \n` : '') +
+        (isAdmin || !isTeacher ? `Как связаться: *${order.contactOption.name}* \n` : '') +
         `Статус заказа: *${statusMeaningMap[order.status.name]}*` + extraInfo;
 }
 
