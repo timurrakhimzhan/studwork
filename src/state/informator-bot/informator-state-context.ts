@@ -113,7 +113,8 @@ export default class InformatorStateContext extends AbstractStateContext {
         }
         if(message.text?.trim() === 'Вернуться в меню') {
             return this.setState(new MainMenuState(this));
-        }
+
+  }
         return super.messageController(message);
     }
 

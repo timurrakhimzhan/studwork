@@ -41,7 +41,8 @@ export default class InformatorBotContext extends AbstractBotContext {
             where: {
                 chatId: {
                     [Op.ne]: null
-                }
+                },
+                mock: !!process.env['MOCK'],
             }
         });
         await Promise.all(teachersLoggedIn.map(async (teacherLoggedIn) => {
