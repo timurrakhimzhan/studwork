@@ -4,6 +4,7 @@ import axios from "axios";
 import Order from "../database/models/Order";
 import moment from "moment";
 import {
+    CURRENCY,
     STATUS_FINISHED,
     STATUS_NOT_PAYED,
     STATUS_PRICE_NOT_ASSIGNED,
@@ -21,7 +22,7 @@ export const generateSubjectsMessage = (subjects: Array<Subject>) => {
 
 export const generatePriceList = (subject: Subject) => {
     return `Прайс-лист (сумма может оказаться выше, в зависимости от трудоемкости и сложности заданий):\n${subject.workTypes.map(workType => 
-        `${workType.name}: *${workType.SubjectWorkType?.minPrice}тг*`).join('\n')}`
+        `${workType.name}: *${workType.SubjectWorkType?.minPrice}${CURRENCY.label}*`).join('\n')}`
 }
 
 export const generateInlineMenu = (menuItems: Array<{name: string; callback?: string | null; url?: string | null}>): Array<Array<InlineKeyboardButton>> =>{
@@ -79,7 +80,7 @@ export const generateReceipt = (order: Order, isTeacher: boolean = false, isAdmi
     }
     if(order.status.name === STATUS_FINISHED) {
         extraInfo = extraInfo + ` \n` +
-            `Цена: *${order.price}тг* \n` +
+            `Цена: *${order.price}${CURRENCY.label}* \n` +
             `Комментарий к цене: *${order.priceComment}* \n` +
             `Комментарий к выполненному заданию: *${order.solutionComment}*`
     }
@@ -93,7 +94,7 @@ export const generateReceipt = (order: Order, isTeacher: boolean = false, isAdmi
         (isAdmin ? `Юзернейм клиента: ${userName} \n` : '') +
         `Предмет: *${order.subject.name}* \n` +
         `Тип работы: *${order.workType.name}*\n` +
-        `Цена в прайс-листе: *${minPrice}тг*\n` +
+        `Цена в прайс-листе: *${minPrice}${CURRENCY.label}*\n` +
         `Тема работы: *${order.topic || 'Тема не указана'}*\n` +
         `Файл: *${order.assignmentUrl ? 'Прикреплен' : 'Не прикреплен'}*\n` +
         `Комментарий клиента: *${order.comment}* \n` +
@@ -140,7 +141,7 @@ export const generateClientNotification = (order: Order) => {
     if(order.status.name === STATUS_NOT_PAYED) {
         return `*Учитель установил цену вашего заказа!* \n` +
             `*Заказ #${order.orderId}* \n` +
-            `Цена: *${order.price}тг* \n` + lastLine;
+            `Цена: *${order.price}${CURRENCY.label}* \n` + lastLine;
     }
     if(order.status.name === STATUS_FINISHED) {
         return `*Учитель выполнил ваш заказ!* \n` +
@@ -150,4 +151,4 @@ export const generateClientNotification = (order: Order) => {
             `*Спасибо за пользование услугами нашего сервиса!*`;
     }
     return `*Обновился статус заказа #${order.orderId}* \n` + lastLine;
-}
+};

@@ -1,7 +1,7 @@
 import Order from "../../database/models/Order";
 import {LabeledPrice, Message, SendMessageOptions} from "node-telegram-bot-api";
 import {OrdersState, ReceiverStateContext, AbstractOrderState} from "./internal";
-import {STATUS_PAYED} from "../../constants";
+import {CURRENCY, STATUS_PAYED} from "../../constants";
 
 export default class OrderPaymentState extends AbstractOrderState {
     stateContext: ReceiverStateContext;
@@ -27,16 +27,15 @@ export default class OrderPaymentState extends AbstractOrderState {
         }
         const payload = Date.now() + stateContext.getChatId() + '';
         const title = 'Оплата заявки';
-        const description = 'Пожалуйста, оплатите ' + priceNum + 'тг, чтобы продолжить.'
+        const description = 'Пожалуйста, оплатите ' + priceNum + CURRENCY.label + ', чтобы продолжить.';
         const startParam = 'pay';
-        const currency = 'RUB';
-        const price: LabeledPrice = {label: priceNum + ' тг ', amount: priceNum * 100 };
+        const currency = CURRENCY.code;
+        const price: LabeledPrice = {label: priceNum + CURRENCY.label + ' ', amount: priceNum * 100 };
         try {
             const invoiceMessage = await stateContext.getBotContext().getBot().sendInvoice(stateContext.getChatId(), title, description, payload, paymentToken, startParam, currency, [price]);
             await this.onNewMessage();
             this.invoiceMessageIdToDelete = invoiceMessage.message_id;
         } catch (e) {
-            console.log(e);
             await stateContext.sendMessage('Прозошла непредвиденная ошибка. Свяжитесь с службой поддержки.');
             await stateContext.setState(new OrdersState(stateContext));
         }
@@ -50,7 +49,7 @@ export default class OrderPaymentState extends AbstractOrderState {
             return stateContext.setState(new OrdersState(stateContext));
         }
         const statuses = stateContext.getBotContext().getStatuses();
-        const statusFound = statuses.find((status) => status.name === STATUS_PAYED)
+        const statusFound = statuses.find((status) => status.name === STATUS_PAYED);
         if(!statusFound) {
             const stateContext = this.stateContext;
             await stateContext.sendMessage('Ошибка сервера, пожалуйста, повторите позже');

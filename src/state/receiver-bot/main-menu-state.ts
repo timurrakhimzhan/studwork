@@ -30,9 +30,15 @@ class MainMenuState extends AbstractReceiverBaseState {
         const botContext = this.stateContext.getBotContext();
         const stateContext = this.stateContext;
         if(message.text?.trim() === 'Предметы') {
+            if(botContext.getSubjects().length === 0) {
+                return stateContext.sendMessage('Извините, список предметов в данный момент пусть.');
+            }
             return stateContext.sendMessage(generateSubjectsMessage(botContext.getSubjects()))
         }
         if(message.text?.trim() === 'Прайс-лист') {
+            if(botContext.getSubjects().length === 0) {
+                return stateContext.sendMessage('Извините, список предметов в данный момент пусть.');
+            }
             return stateContext.sendMessage('Выберите предмет:',
                 {reply_markup: {inline_keyboard: generateInlineMenu(botContext.getSubjects())}});
         }

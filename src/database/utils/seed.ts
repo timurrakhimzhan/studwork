@@ -81,7 +81,7 @@ export async function fillMockSubjectWorkTypes() {
     return SubjectWorkType.bulkCreate([
         {subjectId: math.subjectId, workTypeId: quiz.workTypeId, minPrice: 3000},
         {subjectId: math.subjectId, workTypeId: homework.workTypeId, minPrice: 2000},
-        {subjectId: russ.subjectId, workTypeId: essay.workTypeId, minPrice: 200},
+        {subjectId: russ.subjectId, workTypeId: essay.workTypeId, minPrice: 0},
         {subjectId: russ.subjectId, workTypeId: homework.workTypeId, minPrice: 2000},
         {subjectId: history.subjectId, workTypeId: quiz.workTypeId, minPrice: 2700},
         {subjectId: history.subjectId, workTypeId: essay.workTypeId, minPrice: 2500},

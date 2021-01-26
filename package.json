@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --icu-data-dir=node_modules/full-icu ./dist/index.js",
+    "start": "tsc && PROD=true node --icu-data-dir=node_modules/full-icu ./dist/index.js",
     "mock-dev": "tsc && MOCK=true DEV=true node --icu-data-dir=node_modules/full-icu ./dist/index.js",
     "mock-prod": "tsc && MOCK=true PROD=true node --icu-data-dir=node_modules/full-icu ./dist/index.js",
     "mock-prod-remote": "tsc && MOCK=true PROD=true REMOTE=true node --icu-data-dir=node_modules/full-icu ./dist/index.js"

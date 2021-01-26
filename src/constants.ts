@@ -1,6 +1,16 @@
 import {StatusName} from "./database/models/Status";
 import {FeedbackTypeName} from "./database/models/FeedbackType";
 
+type Currency = {
+    label: string;
+    code: string;
+}
+
+export const CURRENCY: Currency = {
+    label: 'руб',
+    code: 'RUB',
+};
+
 
 export const URL_WHATSAPP = 'https://wa.me/77756818268';
 export const URL_TELEGRAM = 'https://t.me/StudWorkk';
@@ -33,3 +43,6 @@ export const STATUS_PAYED: StatusName = 'STATUS_PAYED';
 export const STATUS_FINISHED: StatusName = 'STATUS_FINISHED';
 export const STATUS_REJECTED_BY_CLIENT: StatusName = 'STATUS_REJECTED_BY_CLIENT';
 export const STATUS_REJECTED_BY_TEACHER: StatusName = 'STATUS_REJECTED_BY_TEACHER';
+
+export const ERROR_WRONG_CREDENTIALS = 'ERROR_WRONG_CREDENTIALS';
+export const ERROR_TOO_MANY_ATTEMPTS = 'ERROR_TOO_MANY_ATTEMPTS';

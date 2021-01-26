@@ -1,6 +1,7 @@
 import {AbstractInformatorBaseState, MainMenuState, LoginInputState} from "./internal";
 import {Message} from "node-telegram-bot-api";
 import AuthenticationError from "../../errors/authentication-error";
+import {ERROR_TOO_MANY_ATTEMPTS, ERROR_WRONG_CREDENTIALS} from "../../constants";
 
 export default class PasswordInputState extends AbstractInformatorBaseState {
     async initState(): Promise<any> {
@@ -18,7 +19,12 @@ export default class PasswordInputState extends AbstractInformatorBaseState {
             await stateContext.login(message.chat.username);
         } catch (error) {
             if(error instanceof AuthenticationError) {
-                await stateContext.sendMessage('Неверное сочетание логина и пароля, повторите еще раз');
+                if(error.getType() === ERROR_TOO_MANY_ATTEMPTS) {
+                    await stateContext.sendMessage('Слишком много попыток, повторите позже.');
+                } else {
+                    await stateContext.sendMessage('Неверное сочетание логина и пароля, повторите еще раз');
+
+                }
                 stateContext.resetTeacher();
                 return stateContext.setState(new LoginInputState(stateContext));
             }

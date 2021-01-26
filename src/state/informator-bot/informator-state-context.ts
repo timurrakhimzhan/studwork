@@ -5,28 +5,34 @@ import AuthenticationError from "../../errors/authentication-error";
 import {Message} from "node-telegram-bot-api";
 import Order from "../../database/models/Order";
 import {generateClientNotification, generateTeacherNotification} from "../../utils/message-utils";
+import moment from 'moment';
+import {ERROR_TOO_MANY_ATTEMPTS, ERROR_WRONG_CREDENTIALS} from "../../constants";
 
 export default class InformatorStateContext extends AbstractStateContext {
     protected readonly botContext: InformatorBotContext;
     private teacher: Teacher;
     private isLoggedIn: boolean;
+    private lastLoginDate: Date | null;
+    private loginAttempts: number;
     constructor(botContext: InformatorBotContext, chatId: number) {
         super(botContext, chatId);
         this.botContext = botContext;
         this.state = new WelcomeState(this);
         this.teacher = new Teacher();
         this.isLoggedIn = false;
+        this.lastLoginDate = null;
+        this.loginAttempts = 0;
     }
 
     getTeacher = () => this.teacher;
 
     setTeacher = (teacher: Teacher) => {
         this.teacher = teacher;
-    }
+    };
 
     resetTeacher = () => {
         this.teacher = new Teacher();
-    }
+    };
 
     getIsLoggedIn = () => this.isLoggedIn;
 
@@ -45,18 +51,27 @@ export default class InformatorStateContext extends AbstractStateContext {
     }
 
     async login(username?: string) {
+        const diffHours: number= moment.duration(moment(new Date).diff(this.lastLoginDate)).hours();
+        if(this.loginAttempts >= 5 && diffHours < 1) {
+            this.loginAttempts++;
+            this.lastLoginDate = new Date();
+            throw new AuthenticationError(ERROR_TOO_MANY_ATTEMPTS);
+        }
         const teacher = await Teacher.findOne({ where: {
             login: this.teacher.login,
             mock: !!process.env['MOCK']
         }});
         if(teacher?.password !== this.teacher.password) {
-            throw new AuthenticationError('Wrong password')
+            this.loginAttempts++;
+            this.lastLoginDate = new Date();
+            throw new AuthenticationError(ERROR_WRONG_CREDENTIALS);
         }
         teacher.chatId = this.getChatId();
         teacher.userName = username || null;
         await teacher.save();
         this.teacher = teacher;
         this.isLoggedIn = true;
+        this.loginAttempts = 0;
         this.state = new OrdersState(this);
     }
 
@@ -91,10 +106,10 @@ export default class InformatorStateContext extends AbstractStateContext {
         if(!this.getIsLoggedIn())  {
             return super.messageController(message);
         }
-        const isSessionActive = await this.getIsSessionActive()
+        const isSessionActive = await this.getIsSessionActive();
         if(!isSessionActive) {
             await this.sendMessage('Ваша сессия истекла!');
-            return this.setState(new LoginInputState(this));
+            return this.logout();
         }
         if(message.text?.trim() === 'Вернуться в меню') {
             return this.setState(new MainMenuState(this));
