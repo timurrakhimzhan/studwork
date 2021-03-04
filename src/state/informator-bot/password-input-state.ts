@@ -23,7 +23,6 @@ export default class PasswordInputState extends AbstractInformatorBaseState {
                     await stateContext.sendMessage('Слишком много попыток, повторите позже.');
                 } else {
                     await stateContext.sendMessage('Неверное сочетание логина и пароля, повторите еще раз');
-
                 }
                 stateContext.resetTeacher();
                 return stateContext.setState(new LoginInputState(stateContext));

@@ -91,12 +91,12 @@ export const generateReceipt = (order: Order, isTeacher: boolean = false, isAdmi
     }
     return `*Заказ #${order.orderId}* \n` +
         `Имя клиента: *${order.clientName}* \n` +
-        (isAdmin ? `Юзернейм клиента: ${userName} \n` : '') +
+        `Юзернейм клиента: ${userName} \n` +
         `Предмет: *${order.subject.name}* \n` +
         `Тип работы: *${order.workType.name}*\n` +
         `Цена в прайс-листе: *${minPrice}${CURRENCY.label}*\n` +
         `Тема работы: *${order.topic || 'Тема не указана'}*\n` +
-        `Файл: *${order.assignmentUrl ? 'Прикреплен' : 'Не прикреплен'}*\n` +
+        `Файл: *${order.assignmentUrls ? 'Прикреплен' : 'Не прикреплен'}*\n` +
         `Комментарий клиента: *${order.comment}* \n` +
         `Дата сдачи: *${date}* \n` +
         `Время: *${time}* \n` +
@@ -109,7 +109,6 @@ export const generateReceipt = (order: Order, isTeacher: boolean = false, isAdmi
 export const generateFeedbackInfo = (feedback: Feedback) => {
     const userName = feedback.username ? '@' + feedback.username : '*Юзернейм не указан*';
     return `*Отзыв #${feedback.feedbackId}* \n` +
-        `Никнейм: *${feedbackTypeMeaningMap[feedback.feedbackType.name]}* \n` +
         `Юзернейм клиента: ${userName} \n` +
         `Оценка: *${feedbackTypeMeaningMap[feedback.feedbackType.name]}* \n` +
         `Комментарий: *${feedback.comment}*`;

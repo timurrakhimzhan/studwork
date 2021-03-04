@@ -89,6 +89,7 @@ class ChooseContactOptionState extends AbstractReceiverOrderState {
         order.contactOption = contactOptionFound;
         order.status = statusPriceNotAssigned;
         order.teacher = teacher;
+        order.creationDate = new Date();
         await order.save();
 
         await Promise.all([
@@ -106,7 +107,7 @@ class ChooseContactOptionState extends AbstractReceiverOrderState {
         order.workType = workType;
         await stateContext.sendMessage(generateReceipt(order));
         await stateContext.sendMessage('Спасибо за пользование услугами нашего сервиса! ' +
-            'Учитель оценит стоймость выполнения вышего задания, после чего *Вам придет уведомление об оплате*, спасибо!')
+            'Учитель оценит стоимость выполнения вашего задания, после чего *Вам придет уведомление об оплате*, спасибо!  ')
         await stateContext.notifyInformatorBot(order);
         await stateContext.setState(new MainMenuState(stateContext));
     }

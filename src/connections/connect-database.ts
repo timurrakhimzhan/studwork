@@ -13,7 +13,7 @@ const connectDatabase = () => {
             port: 5432,
             sync: {
                 force: false,
-                alter: false,
+                alter: true,
             },
             models: [path.join(process.cwd(), 'dist/database/models/*.js')],
             logging: false,

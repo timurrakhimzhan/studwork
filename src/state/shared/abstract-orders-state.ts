@@ -31,7 +31,7 @@ export default abstract class AbstractOrdersState extends AbstractItemsState<Sta
 
     protected generateExtraInlineMarkup(order: Order): Array<Array<InlineKeyboardButton>> {
         const inlineMarkup: Array<Array<InlineKeyboardButton>> = [];
-        if(order.assignmentUrl) {
+        if(order.assignmentUrls) {
             inlineMarkup.push([{text: 'Показать прикрепленный файл', callback_data: CALLBACK_CLIENT_FILE}])
         }
         if(order.status.name === STATUS_FINISHED) {
@@ -55,7 +55,7 @@ export default abstract class AbstractOrdersState extends AbstractItemsState<Sta
         const callbackData = callback.data as string;
 
         if(callbackData === CALLBACK_CLIENT_FILE) {
-            const url = order.assignmentUrl;
+            const url = order.assignmentUrls;
             try {
                 const document = await getBufferFromUrl(url || '');
                 await bot.sendDocument(stateContext.getChatId(), document, {}, {

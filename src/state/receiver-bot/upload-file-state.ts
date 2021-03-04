@@ -17,6 +17,9 @@ class UploadFileState extends AbstractReceiverOrderState {
             await stateContext.sendMessage('Нужно прикрепить фотографию/документ/архив, либо указать тему работы, чтобы продолжить.');
             return;
         }
+        if(this.order.assignmentUrls) {
+            this.order.assignmentUrls = [];
+        }
         let url: string | null = null;
         let topic: string | null = message.text || null;
         if(message.photo) {
@@ -29,8 +32,10 @@ class UploadFileState extends AbstractReceiverOrderState {
             return;
         }
         this.order.topic = topic;
-        this.order.assignmentUrl = url;
-        await stateContext.setState(new CommentInputState(stateContext, this.order));
+        this.order.assignmentUrls?.push(url as string);
+        if(!this.order.assignmentUrls?.length) {
+            await stateContext.setState(new CommentInputState(stateContext, this.order));
+        }
     }
 }
 

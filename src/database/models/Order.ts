@@ -5,7 +5,7 @@ import Teacher from "./Teacher";
 import Status from "./Status";
 import WorkType from "./WorkType";
 
-@Table({timestamps: true})
+@Table({timestamps: false})
 export default class Order extends Model {
     @Column({primaryKey: true, autoIncrement: true})
     orderId!: number;
@@ -40,11 +40,17 @@ export default class Order extends Model {
     @Column({type: DataType.DATE, allowNull: false})
     datetime!: Date;
 
+    @Column({type: DataType.DATE, allowNull: false})
+    creationDate!: Date;
+
+    @Column({type: DataType.DATE, allowNull: true})
+    paymentDate!: Date | null;
+
     @Column({allowNull: false})
     comment!: string;
 
-    @Column({type: DataType.TEXT, allowNull: true})
-    assignmentUrl!: string | null;
+    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    assignmentUrls!: Array<string> | null;
 
     @Column({type: DataType.INTEGER, allowNull: true})
     price!: number | null;

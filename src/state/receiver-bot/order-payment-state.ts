@@ -55,6 +55,7 @@ export default class OrderPaymentState extends AbstractOrderState {
             await stateContext.sendMessage('Ошибка сервера, пожалуйста, повторите позже');
             return stateContext.setState(new OrdersState(stateContext));
         }
+        this.order.paymentDate = new Date();
         await this.order.$set('status', statusFound);
         this.invoiceMessageIdToDelete = null;
         await stateContext.sendMessage('Оплата прошла успешно, мы с Вами свяжемся.');

@@ -14,7 +14,7 @@ import {CALLBACK_PHONE_CALL} from "../../constants";
 const mainMenu: Array<Array<KeyboardButton>> =  [
     [{text: 'Предметы'}, {text: 'Заказать работу'}],
     [{text: 'Прайс-лист'}, {text: 'Мои заказы'}],
-    [{text: 'Контакты'}, {text: 'Оценить работу бота'}]
+    [{text: 'Поддержка'}, {text: 'Оценить работу бота'}]
 ];
 
 class MainMenuState extends AbstractReceiverBaseState {

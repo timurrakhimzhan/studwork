@@ -52,7 +52,7 @@ export default class InformatorStateContext extends AbstractStateContext {
 
     async login(username?: string) {
         const diffHours: number= moment.duration(moment(new Date).diff(this.lastLoginDate)).hours();
-        if(this.loginAttempts >= 5 && diffHours < 1) {
+        if(this.loginAttempts >= 10 && diffHours < 1) {
             this.loginAttempts++;
             this.lastLoginDate = new Date();
             throw new AuthenticationError(ERROR_TOO_MANY_ATTEMPTS);

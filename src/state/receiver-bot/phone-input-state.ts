@@ -3,7 +3,7 @@ import {Message} from "node-telegram-bot-api";
 
 class PhoneInputState extends AbstractReceiverOrderState {
     async initState() {
-        await this.stateContext.sendMessage('Введите Ваш номер телефона, например +77071231212 или 87071231212:');
+        await this.stateContext.sendMessage('Введите Ваш номер телефона, в формате (“+7” или “8”):');
     }
 
     async onBackMessage(): Promise<any> {
@@ -15,7 +15,7 @@ class PhoneInputState extends AbstractReceiverOrderState {
         const isPlusSevenFormat = message.text?.trim().slice(0, 2) === '+7' && message.text?.replace(/\D/g, '').length === 11;
         const isEightFormat = message.text?.trim().slice(0, 1) === '8' && message.text?.replace(/\D/g, '').length === 11;
         if(!message.text || !isPlusSevenFormat && !isEightFormat) {
-            await stateContext.sendMessage('Некорректный номер телефона, *номер должен начинаться на +7 или 8*, например +77071231212 или 87071231212. Пожалуйста, повторите попытку.');
+            await stateContext.sendMessage('Некорректный номер телефона, *номер должен начинаться в формате ("+7" или "8")*');
             return;
         }
         this.order.phone = message.text as string;
