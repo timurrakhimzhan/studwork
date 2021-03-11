@@ -3,7 +3,7 @@ import {Message} from "node-telegram-bot-api";
 
 class PhoneInputState extends AbstractReceiverOrderState {
     async initState() {
-        await this.stateContext.sendMessage('Введите Ваш номер телефона, в формате (“+7” или “8”):');
+        await this.stateContext.sendMessage('Введите Ваш номер телефона, *в формате (“+7” или “8”)*:');
     }
 
     async onBackMessage(): Promise<any> {

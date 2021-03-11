@@ -17,11 +17,14 @@ export default class FeedbacksState extends AbstractItemsState<FeedbackType, Fee
         this.stateContext = stateContext;
     }
 
-    async initState(): Promise<any> {
+    async initMaps(): Promise<any> {
         const feedbackTypeCounts = await this.fetchFeedbackTypeCounts();
         feedbackTypeCounts.forEach((feedbackTypeCount) => {
             this.categoryCountMap[feedbackTypeCount.get('name')] = parseInt(feedbackTypeCount.get('feedbacksCount') as string)
         })
+    }
+
+    async initState(): Promise<any> {
         await this.stateContext.sendMessage('Выберите категорию отзыва:');
     }
 

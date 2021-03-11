@@ -62,6 +62,8 @@ export const generateReceipt = (order: Order, isTeacher: boolean = false, isAdmi
     const formatter =  Intl.DateTimeFormat(['ru-RU'], {day: 'numeric', month: 'long', year: 'numeric'});
     const date = formatter.format(order.datetime);
     const time = moment(order.datetime).format('HH:mm');
+    const creationDate = formatter.format(order.creationDate);
+    const paymentDate = order.paymentDate ? formatter.format(order.paymentDate) : null;
     const subject = order.workType.subjects.find((subject) => subject.name === order.subject.name);
     const minPrice = subject?.SubjectWorkType?.minPrice || 'Не указано';
     let extraInfo = '';
@@ -91,15 +93,17 @@ export const generateReceipt = (order: Order, isTeacher: boolean = false, isAdmi
     }
     return `*Заказ #${order.orderId}* \n` +
         `Имя клиента: *${order.clientName}* \n` +
+        `Дата совершение заказа: *${creationDate}* \n` +
         `Юзернейм клиента: ${userName} \n` +
         `Предмет: *${order.subject.name}* \n` +
         `Тип работы: *${order.workType.name}*\n` +
         `Цена в прайс-листе: *${minPrice}${CURRENCY.label}*\n` +
         `Тема работы: *${order.topic || 'Тема не указана'}*\n` +
-        `Файл: *${order.assignmentUrls ? 'Прикреплен' : 'Не прикреплен'}*\n` +
+        `Файл: *${order.assignmentFile ? 'Прикреплен' : 'Не прикреплен'}*\n` +
         `Комментарий клиента: *${order.comment}* \n` +
         `Дата сдачи: *${date}* \n` +
-        `Время: *${time}* \n` +
+        `Время сдачи: *${time}* \n` +
+        (paymentDate ? `Дата оплаты: *${paymentDate}* \n` : '') +
         (isAdmin || !isTeacher ? `Телефон клиента: *${order.phone}* \n` : '') +
         (isAdmin || !isTeacher ? `Почта клиента: *${order.email}* \n` : '') +
         (isAdmin || !isTeacher ? `Как связаться: *${order.contactOption.name}* \n` : '') +

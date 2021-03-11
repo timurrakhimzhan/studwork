@@ -77,7 +77,7 @@ export default class InformatorStateContext extends AbstractStateContext {
 
     async logout() {
         this.teacher.chatId = null;
-        this.teacher.save();
+        await this.teacher.save();
         this.isLoggedIn = false;
         return this.setState(new LoginInputState(this));
     }
@@ -114,7 +114,7 @@ export default class InformatorStateContext extends AbstractStateContext {
         if(message.text?.trim() === 'Вернуться в меню') {
             return this.setState(new MainMenuState(this));
 
-  }
+        }
         return super.messageController(message);
     }
 

@@ -1,4 +1,4 @@
-import {OrderRejectState, OrderPaymentState, AbstractOrdersState} from "./internal";
+import {AbstractOrdersState, OrderPaymentState, OrderRejectState} from "./internal";
 import Order from "../../database/models/Order";
 import Status from "../../database/models/Status";
 import {Sequelize} from "sequelize-typescript";
@@ -6,12 +6,10 @@ import {CallbackQuery, InlineKeyboardButton,} from "node-telegram-bot-api";
 import Subject from "../../database/models/Subject";
 import WorkType from "../../database/models/WorkType";
 import ContactOption from "../../database/models/ContactOption";
-import {
-    CALLBACK_CLIENT_REJECT, CALLBACK_PAY,
-    STATUS_NOT_PAYED,
-    STATUS_PRICE_NOT_ASSIGNED
-} from "../../constants";
+import {CALLBACK_CLIENT_REJECT, CALLBACK_PAY, STATUS_NOT_PAYED, STATUS_PRICE_NOT_ASSIGNED} from "../../constants";
 import ReceiverStateContext from "./receiver-state-context";
+import {getBufferFromUrl} from "../../utils/message-utils";
+import File from "../../database/models/File";
 
 export default class OrdersState extends AbstractOrdersState {
     stateContext: ReceiverStateContext;
@@ -37,7 +35,7 @@ export default class OrdersState extends AbstractOrdersState {
                 include: [{
                     model: Subject,
                 }]
-            }, Subject, ContactOption],
+            }, Subject, ContactOption, 'assignmentFile', 'solutionFile'],
             order: Sequelize.literal('"Order"."orderId" DESC'),
             limit: 10,
             offset: this.offset
@@ -90,5 +88,33 @@ export default class OrdersState extends AbstractOrdersState {
         if(callbackData === CALLBACK_PAY) {
             await stateContext.setState(new OrderPaymentState(stateContext, order));
         }
+    }
+
+    async getAssignmentDocument(order: Order): Promise<string | Buffer> {
+        if(order.assignmentFile?.receiverFileId) {
+            return order.assignmentFile.receiverFileId
+        }
+        return getBufferFromUrl(order.assignmentFile?.url || '');
+    }
+
+    async setAssignmentFileId(order: Order, fileId: string): Promise<any> {
+        if(order.assignmentFile) {
+            order.assignmentFile.receiverFileId = fileId;
+            return order.assignmentFile.save();
+        }
+    }
+
+    async setSolutionFileId(order: Order, fileId: string): Promise<any> {
+        if(order.solutionFile) {
+            order.solutionFile.receiverFileId = fileId;
+            return order.solutionFile.save();
+        }
+    }
+
+    async getSolutionDocument(order: Order): Promise<string | Buffer> {
+        if(order.solutionFile?.receiverFileId) {
+            return order.solutionFile.receiverFileId
+        }
+        return getBufferFromUrl(order.solutionFile?.url || '');
     }
 }

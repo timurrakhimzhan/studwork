@@ -4,6 +4,8 @@ import ContactOption from "./ContactOption";
 import Teacher from "./Teacher";
 import Status from "./Status";
 import WorkType from "./WorkType";
+import File from "./File";
+import {Col} from "sequelize/types/lib/utils";
 
 @Table({timestamps: false})
 export default class Order extends Model {
@@ -49,8 +51,8 @@ export default class Order extends Model {
     @Column({allowNull: false})
     comment!: string;
 
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
-    assignmentUrls!: Array<string> | null;
+    @BelongsTo(() => File, 'assignmentFileId')
+    assignmentFile!: File | null;
 
     @Column({type: DataType.INTEGER, allowNull: true})
     price!: number | null;
@@ -58,8 +60,8 @@ export default class Order extends Model {
     @Column({type: DataType.TEXT, allowNull: true})
     priceComment!: string | null;
 
-    @Column({type: DataType.TEXT, allowNull: true})
-    solutionUrl!: string | null;
+    @BelongsTo(() => File, 'solutionFileId')
+    solutionFile!: File | null;
 
     @Column({type: DataType.TEXT, allowNull: true})
     solutionComment!: string | null;

@@ -1,5 +1,7 @@
 import {AbstractInformatorOrderState, OrderSolutionCommentState} from "./internal";
 import {Message} from "node-telegram-bot-api";
+import {extractFileInfo} from "../../utils/extract-file-info";
+import File from "../../database/models/File";
 
 
 export default class OrderUploadSolutionState extends AbstractInformatorOrderState {
@@ -14,17 +16,15 @@ export default class OrderUploadSolutionState extends AbstractInformatorOrderSta
         if(!message.photo && !message.document) {
             return  stateContext.sendMessage('Нужно прикрепить фотографию/документ/архив, чтобы продолжить.');
         }
-        let url: string | null = null;
-        if(message.photo) {
-            url = await bot.getFileLink(message.photo[message.photo.length - 1].file_id);
-        } else if(message.document) {
-            url = await bot.getFileLink(message.document.file_id);
-        }
-        if(!url) {
+        let {url, fileId} = await extractFileInfo(bot, message);
+        if(!url || !fileId) {
             await stateContext.sendMessage('Ошибка ввода. Нужно прикрепить фотографию/документ/архив, пожалуйста, повторите попытку.');
             return;
         }
-        this.order.solutionUrl = url;
+        const file = new File();
+        file.url = url;
+        file.informatorFileId = fileId;
+        this.order.solutionFile = file;
         await stateContext.setState(new OrderSolutionCommentState(stateContext, this.order))
     }
 }

@@ -23,6 +23,7 @@ export { default as TimeInputState} from './time-input-state'
 export { default as PhoneInputState } from './phone-input-state';
 export { default as EmailInputState } from './email-input-state';
 export { default as ChooseContactOptionState } from './choose-contact-option-state';
+export { default as SaveOrderState } from './save-order-state';
 
 export { default as OrdersState } from './orders-state';
 export { default as OrderRejectState } from './order-reject-state';

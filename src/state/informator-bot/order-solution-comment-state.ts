@@ -14,7 +14,7 @@ export default class OrderSolutionCommentState extends AbstractInformatorOrderSt
     }
 
     private async resetSolution() {
-        this.order.solutionUrl = null;
+        this.order.solutionFile = null;
         this.order.solutionComment = null;
     }
 
@@ -39,6 +39,10 @@ export default class OrderSolutionCommentState extends AbstractInformatorOrderSt
         if(!message.text?.trim().length) {
             return stateContext.sendMessage('Комментарий должен содержать символы');
         }
+        if(!this.order.solutionFile) {
+            await stateContext.sendMessage('Ошибка: не обнаружено решение. Пожалуйста, загрузите файл еще раз.');
+            return this.onBackMessage();
+        }
         this.order.solutionComment = message.text;
         const statuses = stateContext.getBotContext().getStatuses();
         const statusFound = statuses.find((status) => status.name === STATUS_FINISHED);
@@ -48,6 +52,8 @@ export default class OrderSolutionCommentState extends AbstractInformatorOrderSt
         }
         await this.order.save();
         await this.order.$set('status', statusFound);
+        await this.order.solutionFile.save();
+        await this.order.$set('solutionFile', this.order.solutionFile );
         await stateContext.sendMessage('Выполненное задание успешно загружено!');
         this.order.status = statusFound;
         await stateContext.notifyReceiverBot(this.order);

@@ -15,7 +15,7 @@ import {
     STATUS_PRICE_NOT_ASSIGNED
 } from "../../constants";
 import OrderUploadSolutionState from "./order-upload-solution-state";
-import {generateReceipt} from "../../utils/message-utils";
+import {generateReceipt, getBufferFromUrl} from "../../utils/message-utils";
 
 export default class OrdersState extends AbstractOrdersState {
     stateContext: InformatorStateContext;
@@ -60,7 +60,7 @@ export default class OrdersState extends AbstractOrdersState {
         const teacher = this.stateContext.getTeacher();
         if(teacher.isAdmin) {
             return Order.findAll({
-                include: [Subject, ContactOption, Teacher, {
+                include: [Subject, ContactOption, Teacher, 'assignmentFile', 'solutionFile', {
                     model: Status,
                     where: { name: this.currentCategory },
                 }, {
@@ -75,7 +75,7 @@ export default class OrdersState extends AbstractOrdersState {
             });
         }
         return Order.findAll({
-            include: [Subject, ContactOption,
+            include: [Subject, ContactOption, 'assignmentFile', 'solutionFile',
             {
                 model: Status,
                 where: { name: this.currentCategory },
@@ -132,5 +132,33 @@ export default class OrdersState extends AbstractOrdersState {
         }
 
         return super.callbackController(callback);
+    }
+
+    async getAssignmentDocument(order: Order): Promise<string | Buffer> {
+        if(order.assignmentFile?.informatorFileId) {
+            return order.assignmentFile.informatorFileId
+        }
+        return getBufferFromUrl(order.assignmentFile?.url || '');
+    }
+
+    async setAssignmentFileId(order: Order, fileId: string): Promise<any> {
+        if(order.assignmentFile) {
+            order.assignmentFile.informatorFileId = fileId;
+            return order.assignmentFile.save();
+        }
+    }
+
+    async setSolutionFileId(order: Order, fileId: string): Promise<any> {
+        if(order.solutionFile) {
+            order.solutionFile.informatorFileId = fileId;
+            return order.solutionFile.save();
+        }
+    }
+
+    async getSolutionDocument(order: Order): Promise<string | Buffer> {
+        if(order.solutionFile?.informatorFileId) {
+            return order.solutionFile.informatorFileId
+        }
+        return getBufferFromUrl(order.solutionFile?.url || '');
     }
 }

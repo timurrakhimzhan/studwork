@@ -3,7 +3,6 @@ import path from "path";
 
 const connectDatabase = () => {
     return new Promise((resolve, reject) => {
-        console.log(process.cwd());
         const sequelize = new Sequelize({
             username: process.env['DB_USERNAME'],
             database: process.env['DB_NAME'],

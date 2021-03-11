@@ -34,6 +34,7 @@ export default abstract class AbstractItemsState<T, K extends string, R> extends
     }
 
     abstract initState(): Promise<any>;
+    abstract initMaps(): Promise<any>;
 
     protected abstract fetchItems(): Promise<Array<R>>;
     protected abstract generateExtraInlineMarkup(item: R): Array<Array<InlineKeyboardButton>>;
@@ -110,6 +111,7 @@ export default abstract class AbstractItemsState<T, K extends string, R> extends
             return this.showItem();
         }
         await this.initState();
+
     }
 
     async callbackController(callback: CallbackQuery): Promise<any> {

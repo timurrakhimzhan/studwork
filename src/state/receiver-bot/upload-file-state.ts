@@ -1,5 +1,7 @@
 import {AbstractReceiverBaseState, CommentInputState, AbstractReceiverOrderState, ChooseWorkTypeState} from "./internal";
 import {Message} from "node-telegram-bot-api";
+import File from "../../database/models/File";
+import {extractFileInfo} from "../../utils/extract-file-info";
 
 class UploadFileState extends AbstractReceiverOrderState {
      async initState() {
@@ -7,35 +9,34 @@ class UploadFileState extends AbstractReceiverOrderState {
     }
 
     async onBackMessage(): Promise<any> {
+        this.order.assignmentFile = null;
         return this.stateContext.setState(new ChooseWorkTypeState(this.stateContext, this.order));
     }
 
     async messageController(message: Message) {
+        if(this.order.assignmentFile) {
+            return;
+        }
         const stateContext = this.stateContext;
         const bot = stateContext.getBotContext().getBot();
         if(!message.photo && !message.document && !message.text) {
-            await stateContext.sendMessage('Нужно прикрепить фотографию/документ/архив, либо указать тему работы, чтобы продолжить.');
+            await stateContext.sendMessage('Нужно прикрепить фотографию/документ/архив, либо указать тему работы, чтобы продолжить. (Если у вас несколько фотографий, прикрепите архив)');
             return;
         }
-        if(this.order.assignmentUrls) {
-            this.order.assignmentUrls = [];
-        }
-        let url: string | null = null;
         let topic: string | null = message.text || null;
-        if(message.photo) {
-            url = await bot.getFileLink(message.photo[message.photo.length - 1].file_id);
-        } else if(message.document) {
-            url = await bot.getFileLink(message.document.file_id);
-        }
-        if(!url && !topic) {
+        let {url, fileId} = await extractFileInfo(bot, message);
+        if(!fileId && !topic) {
             await stateContext.sendMessage('Ошибка ввода. Нужно прикрепить фотографию/документ/архив, либо указать тему работы, пожалуйста, повторите попытку.');
             return;
         }
         this.order.topic = topic;
-        this.order.assignmentUrls?.push(url as string);
-        if(!this.order.assignmentUrls?.length) {
-            await stateContext.setState(new CommentInputState(stateContext, this.order));
+        if(url) {
+            const file = new File();
+            file.url = url;
+            file.receiverFileId = fileId;
+            this.order.assignmentFile = file;
         }
+        await stateContext.setState(new CommentInputState(stateContext, this.order));
     }
 }
 
