@@ -42,7 +42,7 @@ class MainMenuState extends AbstractReceiverBaseState {
             return stateContext.sendMessage('Выберите предмет:',
                 {reply_markup: {inline_keyboard: generateInlineMenu(botContext.getSubjects())}});
         }
-        if(message.text?.trim() === 'Контакты') {
+        if(message.text?.trim() === 'Поддержка') {
             return stateContext.sendMessage('Контакты:', {reply_markup: {
                 inline_keyboard: generateInlineMenu(botContext.getContacts())
             }});
